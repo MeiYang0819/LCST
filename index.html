@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>勞工名卡登記表｜Start Work System Test / Labor Card System Test</title>
+
+  <style>
+  /* <======== 檔案用途：系統常數、簽章工具、小工具、固定頁籤定位 ======== > */
+
+  :root {
+    /* --------系統共用常數（可全站調整）-------- */
+    --card-w: 980px;            /* 表單卡片最大寬度（可調） */
+    --radius: 16px;             /* 卡片圓角（可調） */
+    --border: #2a2a2a;          /* 邊框色（可調） */
+    --ink: #eaeaea;             /* 主要文字色（可調） */
+    --muted: #a8a8a8;           /* 次要文字色（可調） */
+    --danger: #ef4444;          /* 錯誤色（可調） */
+    --ok: #22c55e;              /* 成功/通過色（可調） */
+    --accent: #60a5fa;          /* 重點色/聚焦邊框（可調） */
+    --btn-bg: #121212;          /* 按鈕底色（可調） */
+    --btn-border: #2a2a2a;      /* 按鈕邊框色（可調） */
+
+    --title-size: 14px;         /* 預設「頁面標題」字級（可調；每頁可覆蓋） */
+    --content-size: 12px;       /* 預設「內容/表單」字級（可調；每頁可覆蓋） */
+    --footer-size: 11px;        /* 頁尾字級（可調；每頁可覆蓋） */
+
+    --section-gap: 16px;        /* 各欄位區塊與段落間距（可調） */
+    --control-pad: 10px 12px;   /* 表單控制項內距（可調） */
+    --control-radius: 12px;     /* 表單控制項圓角（可調） */
+    --control-bg: #0f0f0f;      /* 表單控制項背景（可調） */
+    --control-border: #262626;  /* 表單控制項邊框（可調） */
+    --control-focus: #60a5fa;   /* 表單控制項聚焦外框色（可調） */
+  }
+
+  /* ===== 全站背景（你指定的漸層）===== */
+  html, body {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    font-family:
+      "M PLUS Rounded 1c",      /* 圓潤字體（Google Fonts，如果有載入會優先） */
+      "Nunito",                 /* 拉丁圓潤備援 */
+      "Noto Sans TC",           /* 泛中日韓備援 */
+      "PingFang TC",            /* 蘋方（較圓） */
+      "Microsoft JhengHei",     /* 微軟正黑體 */
+      "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(0deg,rgba(64, 55, 55, 1) 0%, rgba(43, 37, 37, 1) 37%, rgba(0, 0, 0, 1) 100%);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* 外層容器（讓頁尾可黏底） */
+  .page-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  /* 主要卡片區 */
+  .container {
+    width: min(var(--card-w), 96vw); /* 卡片寬度（可調） */
+    margin: 24px auto;
+    background: rgba(255,255,255,0.03); /* 卡片底（可調，可做成每頁覆蓋） */
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 頁首（可視需要顯示版本） */
+  .header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    font-weight: 700;
+    font-size: var(--title-size);
+    letter-spacing: 0.5px;
+  }
+
+  /* 內容區 + sticky footer 布局 */
+  .content {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* 步驟頁 */
+  .step {
+    display: none;
+    font-size: var(--content-size);
+  }
+  .step.active {
+    display: block;
+  }
+
+  .step h2 {
+    margin: 0 0 10px 0;
+    font-size: var(--title-size);
+    text-align: center; /* 依需求：大標題置中 */
+    font-weight: 800;
+  }
+
+  .lead {
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 8px 0 14px 0;
+  }
+
+  .note-list {
+    margin: 8px 0 16px 1.2em;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .fieldset {
+    border: 1px dashed var(--border);
+    border-radius: var(--control-radius);
+    padding: 14px;
+    margin-top: var(--section-gap);
+  }
+  .legend {
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  label { font-weight: 700; display: block; margin-bottom: 6px; }
+  label small { color: var(--muted); font-weight: 600; margin-left: 4px; }
+
+  .row { margin-bottom: var(--section-gap); }
+
+  input[type="text"],
+  input[type="email"],
+  select {
+    width: 100%;
+    padding: var(--control-pad);
+    background: var(--control-bg);
+    border: 1px solid var(--control-border);
+    border-radius: var(--control-radius);
+    outline: none;
+    color: var(--ink);
+    font-size: var(--content-size);
+  }
+  input:focus, select:focus {
+    border-color: var(--control-focus);
+    box-shadow: 0 0 0 3px rgba(96,165,250,.25);
+  }
+
+  .helper { color: var(--muted); margin-top: 6px; font-size: calc(var(--content-size) - 1px); }
+  .error  { color: var(--danger); margin-top: 6px; font-size: calc(var(--content-size)); }
+
+  .checks { display: grid; gap: 8px; margin-top: 8px; }
+  .checks label { font-weight: 600; display: flex; gap: 8px; align-items: flex-start; }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+  .left-actions, .right-actions { display: flex; gap: 10px; }
+  .btn {
+    appearance: none;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--ink);
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: var(--content-size);
+  }
+  .btn.primary { border-color: #2b3548; }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+  .exit {
+    background: rgba(239,68,68,.08);
+    border: 1px solid rgba(239,68,68,.35);
+    color: #fecaca;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 12px;
+    display: none;
+  }
+  .exit.show { display: block; }
+
+  /* 步驟指示（可關閉） */
+  .step-indicator {
+    text-align: right;
+    color: var(--muted);
+    font-size: calc(var(--content-size) - 1px);
+  }
+
+  /* Sticky Footer（每頁都會看到） */
+  .footer {
+    margin-top: auto; /* 把 footer 推到卡片底部 */
+    border-top: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: center;
+    color: var(--muted);
+    font-size: var(--footer-size);
+  }
+
+  /* ========== 每頁獨立設定區（可逐頁覆蓋） ========== */
+
+  /*//* --------配色／字級設定區（第1頁：首頁，可自行調整；新增）--------*/*/
+  .step[data-page="1"]{
+    --title-size: 14px;     /* 第1頁標題字級 */
+    --content-size: 12px;   /* 第1頁內容字級 */
+    /* 你也可在此加第1頁專屬色，如卡片底、按鈕色等 */
+  }
+
+  /*//* --------配色／字級設定區（第2頁：基本資料1，可自行調整；新增）--------*/*/
+  .step[data-page="2"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第3頁：個資導言A，可自行調整；新增）--------*/*/
+  .step[data-page="3"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第4頁：個資1，可自行調整；新增）--------*/*/
+  .step[data-page="4"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第5頁：個資導言B，可自行調整；新增）--------*/*/
+  .step[data-page="5"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第6頁：個資2，可自行調整；新增）--------*/*/
+  .step[data-page="6"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第7頁：聯絡與學歷，可自行調整；新增）--------*/*/
+  .step[data-page="7"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第8頁：其他資訊導言，可自行調整；新增）--------*/*/
+  .step[data-page="8"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第9頁：緊急聯絡人，可自行調整；新增）--------*/*/
+  .step[data-page="9"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第10頁：眷屬加保，可自行調整；新增）--------*/*/
+  .step[data-page="10"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第11頁：上傳說明，可自行調整；新增）--------*/*/
+  .step[data-page="11"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第12頁：上傳實作，可自行調整；新增）--------*/*/
+  .step[data-page="12"]{ --title-size: 14px; --content-size: 12px; }
+
+  /*//* --------配色／字級設定區（第13頁：完成頁，可自行調整；新增）--------*/*/
+  .step[data-page="13"]{ --title-size: 14px; --content-size: 12px; }
+
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="container" role="region" aria-label="勞工名卡 分步表單">
+
+    <div class="header">📌 勞工名卡登記表</div>
+
+    <div class="content">
+      <div class="step-indicator" id="stepIndicator">第 1 / 13 頁</div>
+
+      <!-- 第1頁：首頁／同意 -->
+      <section class="step active" data-page="1" id="step-1">
+        <h2>📌 勞工名卡登記表</h2>
+        <ol class="note-list">
+          <li>請依照下列表單指示執行填寫。</li>
+          <li>上傳之個人身分文件悉依相關法令規範辦理保存。</li>
+          <li>填寫表單若遇到困難請向承辦人提出禮貌詢問。</li>
+          <li>Drunk Caffee 爛醉咖啡－以下簡稱本公司。</li>
+          <li>v1.0.0-11-15-2025-114</li>
+        </ol>
+
+        <div class="fieldset">
+          <span class="legend">是否同意上述事項</span>
+          <div class="row" role="radiogroup">
+            <label><input type="radio" name="agree" value="yes"> 是</label>
+            <label><input type="radio" name="agree" value="no"> 否</label>
+          </div>
+          <div class="exit" id="exitMsg">您選擇了「否」。表單已結束，感謝您撥冗查看。</div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="resetAgree" type="button">清除選擇</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="prev1" type="button" disabled>上一頁</button>
+            <button class="btn" id="next1" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第2頁：基本資料1 -->
+      <section class="step" data-page="2" id="step-2">
+        <h2>© 隸屬團隊 / 工作型態 / 到職日期 / 約定工資</h2>
+
+        <div class="row">
+          <label for="team">© 隸屬團隊 <small>⏍ 請詢問清楚後點選</small></label>
+          <select id="team">
+            <option value="" selected disabled>請選擇</option>
+            <option>外場-𝗦𝗲𝗿𝘃𝗲 𝗧𝗲𝗮𝗺𝘀</option>
+            <option>吧檯-𝗕𝗮𝗿 𝗧𝗲𝗮𝗺𝘀</option>
+            <option>內廚-𝗞𝗶𝘁𝗰𝗵𝗲𝗻 𝗧𝗲𝗮𝗺𝘀</option>
+            <option>收銀-Cashier Teams</option>
+            <option>公關-Public Relations Teams</option>
+            <option>其他-Other</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="workType">© 工作型態 <small>⏍ 請詢問清楚後點選</small></label>
+          <select id="workType">
+            <option value="" selected disabled>請選擇</option>
+            <option>正職/全時工時-Full Time</option>
+            <option>兼職/部分工時-Part Time</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="startDate">© 到職日期</label>
+          <input id="startDate" type="text" placeholder="範例:2025-11-12" />
+          <div class="helper">請以 YYYY-MM-DD 格式填寫，並確保為真實日期。</div>
+          <div class="error" id="errStartDate" style="display:none;">日期格式錯誤或不存在。</div>
+        </div>
+
+        <div class="row">
+          <label for="wage">© 約定工資</label>
+          <input id="wage" type="text" placeholder="範例:40,000 或 210" />
+          <div class="helper">允許千分位逗號；會檢查為正整數/正數。</div>
+          <div class="error" id="errWage" style="display:none;">請輸入正數（可含逗號）。</div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev2" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next2" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第3頁：個人資訊 導言A -->
+      <section class="step" data-page="3" id="step-3">
+        <h2>📌 個人資訊</h2>
+        <ol class="note-list">
+          <li>請依照下列問題指示執行填寫。</li>
+          <li>填寫表單若遇到困難請向承辦人提出禮貌詢問。</li>
+        </ol>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev3" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next3" type="button">下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第4頁：個資1 -->
+      <section class="step" data-page="4" id="step-4">
+        <h2>© 本名 / 性別 / 身分證字號</h2>
+
+        <div class="row">
+          <label for="fullName">© 本名</label>
+          <input id="fullName" type="text" placeholder="請輸入本名" />
+          <div class="error" id="errFullName" style="display:none;">此欄位不得為空。</div>
+        </div>
+
+        <div class="row">
+          <label for="gender">© 性別</label>
+          <select id="gender">
+            <option value="" selected disabled>請選擇</option>
+            <option>男</option>
+            <option>女</option>
+            <option>多元</option>
+          </select>
+          <div class="error" id="errGender" style="display:none;">請選擇性別。</div>
+        </div>
+
+        <div class="row">
+          <label for="nid">© 身分證字號 <small>⏍ 共計10碼</small></label>
+          <input id="nid" type="text" placeholder="例如 A123456789" />
+          <div class="error" id="errNid" style="display:none;">需為 10 碼（英數），例：A123456789。</div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev4" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next4" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第5頁：個人資訊 導言B -->
+      <section class="step" data-page="5" id="step-5">
+        <h2>📌 個人資訊</h2>
+        <ol class="note-list">
+          <li>請依照下列問題指示執行填寫。</li>
+          <li>填寫表單若遇到困難請向承辦人提出禮貌詢問。</li>
+        </ol>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev5" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next5" type="button">下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第6頁：個資2 -->
+      <section class="step" data-page="6" id="step-6">
+        <h2>© 出生 / 地址資訊</h2>
+
+        <div class="row">
+          <label for="birthRoc">© 民國出生年.月.日 <small>⏍ 例：80.02.10</small></label>
+          <input id="birthRoc" type="text" placeholder="請用.分隔民國年.月.日 ☛ 80.02.10" />
+          <div class="error" id="errBirthRoc" style="display:none;">格式錯誤或日期不存在（yy.mm.dd）。</div>
+        </div>
+
+        <div class="row">
+          <label for="birthPlace">© 出生地 <small>⏍ 身分證背面的出生地</small></label>
+          <input id="birthPlace" type="text" placeholder="請輸入出生地" />
+          <div class="error" id="errBirthPlace" style="display:none;">此欄位不得為空。</div>
+        </div>
+
+        <div class="row">
+          <label for="addrHouse">© 戶籍地址 <small>⏍ 背面包含里及鄰都須填寫</small></label>
+          <input id="addrHouse" type="text" placeholder="請輸入戶籍地址" />
+          <div class="error" id="errAddrHouse" style="display:none;">此欄位不得為空。</div>
+        </div>
+
+        <div class="row">
+          <label for="addrLive">© 居住地址 <small>⏍ 勿填寫.同戶籍地</small></label>
+          <input id="addrLive" type="text" placeholder="請輸入居住地址" />
+          <div class="error" id="errAddrLive" style="display:none;">此欄位不得為空，且不得填「同戶籍地」。</div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev6" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next6" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第7頁：聯絡與學歷 -->
+      <section class="step" data-page="7" id="step-7">
+        <h2>© 聯絡方式 / 最高學歷</h2>
+
+        <div class="row">
+          <label for="gmail">© Gmail <small>⏍ 限定 Gmail 並全程小寫</small></label>
+          <input id="gmail" type="email" placeholder="例如：example@gmail.com（請用小寫）" />
+          <div class="error" id="errGmail" style="display:none;">請輸入有效 Gmail，並使用小寫。</div>
+        </div>
+
+        <div class="row">
+          <label for="mobile">© 聯絡手機 <small>⏍ 09xx-xxx-xxx</small></label>
+          <input id="mobile" type="text" placeholder="例如：09xx-xxx-xxx" />
+          <div class="error" id="errMobile" style="display:none;">格式需為 09xx-xxx-xxx。</div>
+        </div>
+
+        <div class="row">
+          <label for="edu">© 最高學歷 <small>⏍ 例：中國文化大學(在學)</small></label>
+          <input id="edu" type="text" placeholder="請輸入最高學歷（就讀中請加上(在學)）" />
+          <div class="error" id="errEdu" style="display:none;">此欄位不得為空。</div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev7" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next7" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第8頁：其他資訊 導言C -->
+      <section class="step" data-page="8" id="step-8">
+        <h2>📌 其他資訊</h2>
+        <ol class="note-list">
+          <li>請依照下列問題指示執行填寫。</li>
+          <li>填寫表單若遇到困難請向承辦人提出禮貌詢問。</li>
+        </ol>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev8" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next8" type="button">下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第9頁：緊急聯絡人 -->
+      <section class="step" data-page="9" id="step-9">
+        <h2>© 緊急聯絡人資訊</h2>
+
+        <div class="row">
+          <label for="emgName">© 緊急連絡人</label>
+          <input id="emgName" type="text" placeholder="請輸入姓名" />
+          <div class="error" id="errEmgName" style="display:none;">此欄不得為空。</div>
+        </div>
+
+        <div class="row">
+          <label for="emgRel">© 關係 <small>⏍ 例：父子</small></label>
+          <input id="emgRel" type="text" placeholder="如：父子" />
+          <div class="error" id="errEmgRel" style="display:none;">此欄不得為空。</div>
+        </div>
+
+        <div class="row">
+          <label for="homePhone">© 家用電話 <small>⏍ 0x-xxxx-xxxx；若無填「無」</small></label>
+          <input id="homePhone" type="text" placeholder="0x-xxxx-xxxx 或 填『無』" />
+          <div class="error" id="errHomePhone" style="display:none;">請填「無」或 0x-xxxx-xxxx 格式。</div>
+        </div>
+
+        <div class="row">
+          <label for="emgMobile">© 連絡手機 <small>⏍ 09xx-xxx-xxx</small></label>
+          <input id="emgMobile" type="text" placeholder="09xx-xxx-xxx" />
+          <div class="error" id="errEmgMobile" style="display:none;">格式需為 09xx-xxx-xxx。</div>
+        </div>
+
+        <div class="row">
+          <label for="emgAddr">© 聯絡地址 <small>⏍ 勿填寫.同戶籍地</small></label>
+          <input id="emgAddr" type="text" placeholder="請輸入聯絡地址" />
+          <div class="error" id="errEmgAddr" style="display:none;">不得為空，且不得填「同戶籍地」。</div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev9" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next9" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第10頁：眷屬加保 -->
+      <section class="step" data-page="10" id="step-10">
+        <h2>© 眷屬是否依附加保</h2>
+
+        <div class="row">
+          <label for="depEnable">© 眷屬是否依附加保</label>
+          <select id="depEnable">
+            <option value="" selected disabled>請選擇</option>
+            <option>是</option>
+            <option>否</option>
+          </select>
+          <div class="error" id="errDepEnable" style="display:none;">請選擇是否依附加保。</div>
+        </div>
+
+        <div id="depFields" style="display:none;">
+          <div class="row">
+            <label for="depRel">© 關係 <small>⏍ 例：父子</small></label>
+            <input id="depRel" type="text" placeholder="如：父子" />
+            <div class="error" id="errDepRel" style="display:none;">此欄不得為空。</div>
+          </div>
+
+          <div class="row">
+            <label for="depName">© 姓名</label>
+            <input id="depName" type="text" placeholder="請輸入姓名" />
+            <div class="error" id="errDepName" style="display:none;">此欄不得為空。</div>
+          </div>
+
+          <div class="row">
+            <label for="depNid">© 身分證字號 <small>⏍ 共計10碼</small></label>
+            <input id="depNid" type="text" placeholder="例如 A123456789" />
+            <div class="error" id="errDepNid" style="display:none;">需為 10 碼（英數）。</div>
+          </div>
+
+          <div class="row">
+            <label for="depBirth">© 民國出生年.月.日 <small>⏍ 例：80.02.10</small></label>
+            <input id="depBirth" type="text" placeholder="請用.分隔 ☛ 80.02.10" />
+            <div class="error" id="errDepBirth" style="display:none;">格式錯誤或日期不存在。</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev10" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next10" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第11頁：上傳檔案 說明 -->
+      <section class="step" data-page="11" id="step-11">
+        <h2>📌 上傳檔案－說明</h2>
+        <ol class="note-list">
+          <li>請詳閱底下 SOP。</li>
+          <li>上傳之個人身分文件。</li>
+          <li>檔案須符合本公司限定規格。</li>
+        </ol>
+
+        <div class="lead"><strong>手機系統－iOS：</strong>請查閱下方影片後，使用拖曳上傳或分享儲存方式上傳檔案。</div>
+        <ul class="note-list">
+          <li>⏍ 請依照手機系統執行 SOP 掃描後上傳</li>
+          <li>⏍ 掃描方式如同影片呈現</li>
+          <li>⏍ 上傳時先更正檔名為自己名字</li>
+          <li>⏍ 格式有誤會退件，請認真查看</li>
+        </ul>
+
+        <div class="lead"><strong>手機系統－Android 流程：</strong></div>
+        <ol class="note-list">
+          <li>點擊雲端硬碟 →</li>
+          <li>點擊＋ →</li>
+          <li>點擊掃描文件 →</li>
+          <li>開始掃描 →</li>
+          <li>存檔雲端上傳</li>
+        </ol>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev11" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next11" type="button">下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第12頁：上傳檔案 實作 -->
+      <section class="step" data-page="12" id="step-12">
+        <h2>📌 上傳檔案－身分證（正／反面）</h2>
+
+        <div class="row">
+          <label for="idFront">上傳區－正面（PDF 或 圖片）</label>
+          <input id="idFront" type="file" accept=".pdf,image/*" />
+          <div class="error" id="errFront" style="display:none;">請選擇正面檔案。</div>
+        </div>
+
+        <div class="row">
+          <label for="idBack">上傳區－反面（PDF 或 圖片）</label>
+          <input id="idBack" type="file" accept=".pdf,image/*" />
+          <div class="error" id="errBack" style="display:none;">請選擇反面檔案。</div>
+        </div>
+
+        <div class="fieldset">
+          <span class="legend">上傳前確認清單</span>
+          <div class="checks">
+            <label><input type="checkbox" id="chk1"> 1. 文件清晰且無反光</label>
+            <label><input type="checkbox" id="chk2"> 2. 證件四邊完整入鏡</label>
+            <label><input type="checkbox" id="chk3"> 3. 文件「完整」對準在框框內</label>
+            <label><input type="checkbox" id="chk4"> 4. 上述都已確認完成動作</label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="left-actions">
+            <button class="btn" id="prev12" type="button">上一頁</button>
+          </div>
+          <div class="right-actions">
+            <button class="btn" id="next12" type="button" disabled>下一頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第13頁：完成 -->
+      <section class="step" data-page="13" id="step-13">
+        <h2>全數完成</h2>
+        <div class="lead" style="text-align:center;">
+          © 勞工名卡登記表
+          <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;">
+          <div>❗️請截圖此畫面給承辦人。</div>
+          <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;">
+          <div>系統已收到資料，將進入處理排程，表單已填寫完畢。</div>
+        </div>
+
+        <div class="actions" style="justify-content:center;">
+          <button class="btn" id="restart" type="button">再填一份</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer" id="footerCopy">
+      © Copyright 2025 MYs System-b1.0.0-11-13
+    </div>
+  </div>
+</div>
+
+<script>
+/* <======== 檔案用途：系統常數、簽章工具、小工具、固定頁籤定位 ======== > */
+
+/* --------系統常數（可調）-------- */
+const VERSION = "v1.0.0-11-15-2025-114"; /* 表單版本字串（顯示於第1頁注意事項） */
+const TOTAL_STEPS = 13;                   /* 總頁數（變更頁數時要同步改） */
+
+/* --------工具：DOM 快捷-------- */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+/* --------小工具：日期驗證（YYYY-MM-DD）-------- */
+function isValidYMD(str) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(str)) return false;
+  const [y,m,d] = str.split("-").map(n=>parseInt(n,10));
+  const dt = new Date(y, m-1, d);
+  return dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
+}
+
+/* --------小工具：ROC 日期驗證（yy.mm.dd 或 yyy.mm.dd）-------- */
+function isValidRocDate(str) {
+  if (!/^\d{2,3}\.\d{2}\.\d{2}$/.test(str)) return false;
+  const [ry, rm, rd] = str.split(".").map(n=>parseInt(n,10));
+  const gy = ry + 1911; /* ROC 轉西元 */
+  const dt = new Date(gy, rm-1, rd);
+  return dt.getFullYear()===gy && (dt.getMonth()+1)===rm && dt.getDate()===rd;
+}
+
+/* --------小工具：台灣手機 09xx-xxx-xxx -------- */
+function isValidMobile(s) {
+  return /^09\d{2}-\d{3}-\d{3}$/.test(s);
+}
+
+/* --------小工具：市話 0x-xxxx-xxxx -------- */
+function isValidHomePhone(s) {
+  return s==="無" || /^0\d-\d{4}-\d{4}$/.test(s);
+}
+
+/* --------小工具：Gmail（小寫）-------- */
+function isValidGmailLower(s) {
+  return /^[a-z0-9._%+-]+@gmail\.com$/.test(s);
+}
+
+/* --------小工具：身分證字號（此版僅檢查 10 碼英數）-------- */
+function isTenAlnum(s) {
+  return /^[A-Za-z0-9]{10}$/.test(s);
+}
+
+/* --------小工具：工資（去逗號後為正數）-------- */
+function isValidWage(s) {
+  const n = parseFloat(String(s).replace(/,/g,""));
+  return Number.isFinite(n) && n>0;
+}
+
+/* --------步驟控制-------- */
+let current = 1;
+
+function showStep(n) {
+  $$(".step").forEach(s=>s.classList.remove("active"));
+  $("#step-"+n).classList.add("active");
+  $("#stepIndicator").textContent = `第 ${n} / ${TOTAL_STEPS} 頁`;
+  current = n;
+}
+
+/* --------第1頁：同意/不同意-------- */
+(function initStep1(){
+  const agreeRadios = $$('input[name="agree"]');
+  const next = $("#next1");
+  const exitMsg = $("#exitMsg");
+  const reset = $("#resetAgree");
+
+  agreeRadios.forEach(r=>{
+    r.addEventListener("change", ()=>{
+      if (r.value==="yes") {
+        next.disabled = false;
+        exitMsg.classList.remove("show");
+      } else {
+        next.disabled = true;
+        exitMsg.classList.add("show");
+      }
+    });
+  });
+
+  reset.addEventListener("click", ()=>{
+    agreeRadios.forEach(r=>r.checked=false);
+    next.disabled = true;
+    exitMsg.classList.remove("show");
+  });
+
+  $("#prev1").addEventListener("click", ()=>{}); /* 首頁無上一頁 */
+  next.addEventListener("click", ()=> showStep(2));
+})();
+
+/* --------第2頁：基本資料1 驗證-------- */
+(function initStep2(){
+  const team = $("#team");
+  const workType = $("#workType");
+  const startDate = $("#startDate");
+  const wage = $("#wage");
+  const next = $("#next2");
+
+  function validate(){
+    let ok = true;
+
+    /* 日期 */
+    if (startDate.value && isValidYMD(startDate.value)) {
+      $("#errStartDate").style.display = "none";
+    } else {
+      $("#errStartDate").style.display = "block";
+      ok = false;
+    }
+
+    /* 工資 */
+    if (wage.value && isValidWage(wage.value)) {
+      $("#errWage").style.display = "none";
+    } else {
+      $("#errWage").style.display = "block";
+      ok = false;
+    }
+
+    if (!team.value) ok = false;
+    if (!workType.value) ok = false;
+
+    next.disabled = !ok;
+  }
+
+  [team, workType, startDate, wage].forEach(el=>{
+    el.addEventListener("input", validate);
+    el.addEventListener("change", validate);
+  });
+
+  $("#prev2").addEventListener("click", ()=> showStep(1));
+  next.addEventListener("click", ()=> showStep(3));
+})();
+
+/* --------第3頁：導言A-------- */
+(function initStep3(){
+  $("#prev3").addEventListener("click", ()=> showStep(2));
+  $("#next3").addEventListener("click", ()=> showStep(4));
+})();
+
+/* --------第4頁：個資1 驗證-------- */
+(function initStep4(){
+  const name = $("#fullName");
+  const gender = $("#gender");
+  const nid = $("#nid");
+  const next = $("#next4");
+
+  function validate(){
+    let ok = true;
+
+    if (name.value.trim()==""){
+      $("#errFullName").style.display="block"; ok=false;
+    } else { $("#errFullName").style.display="none"; }
+
+    if (!gender.value){
+      $("#errGender").style.display="block"; ok=false;
+    } else { $("#errGender").style.display="none"; }
+
+    const v = nid.value.trim();
+    if (!isTenAlnum(v)){
+      $("#errNid").style.display="block"; ok=false;
+    } else { $("#errNid").style.display="none"; }
+
+    next.disabled = !ok;
+  }
+
+  [name, gender, nid].forEach(el=>{
+    el.addEventListener("input", validate);
+    el.addEventListener("change", validate);
+  });
+
+  $("#prev4").addEventListener("click", ()=> showStep(3));
+  next.addEventListener("click", ()=> showStep(5));
+})();
+
+/* --------第5頁：導言B-------- */
+(function initStep5(){
+  $("#prev5").addEventListener("click", ()=> showStep(4));
+  $("#next5").addEventListener("click", ()=> showStep(6));
+})();
+
+/* --------第6頁：個資2 驗證-------- */
+(function initStep6(){
+  const birthRoc = $("#birthRoc");
+  const birthPlace = $("#birthPlace");
+  const addrHouse = $("#addrHouse");
+  const addrLive = $("#addrLive");
+  const next = $("#next6");
+
+  function validate(){
+    let ok = true;
+
+    if (!isValidRocDate(birthRoc.value.trim())){
+      $("#errBirthRoc").style.display="block"; ok=false;
+    } else { $("#errBirthRoc").style.display="none"; }
+
+    if (birthPlace.value.trim()==""){
+      $("#errBirthPlace").style.display="block"; ok=false;
+    } else { $("#errBirthPlace").style.display="none"; }
+
+    if (addrHouse.value.trim()==""){
+      $("#errAddrHouse").style.display="block"; ok=false;
+    } else { $("#errAddrHouse").style.display="none"; }
+
+    const live = addrLive.value.trim();
+    if (live=="" || live.includes("同戶籍地")){
+      $("#errAddrLive").style.display="block"; ok=false;
+    } else { $("#errAddrLive").style.display="none"; }
+
+    next.disabled = !ok;
+  }
+
+  [birthRoc, birthPlace, addrHouse, addrLive].forEach(el=>{
+    el.addEventListener("input", validate);
+    el.addEventListener("change", validate);
+  });
+
+  $("#prev6").addEventListener("click", ()=> showStep(5));
+  next.addEventListener("click", ()=> showStep(7));
+})();
+
+/* --------第7頁：聯絡與學歷 驗證-------- */
+(function initStep7(){
+  const gmail = $("#gmail");
+  const mobile = $("#mobile");
+  const edu = $("#edu");
+  const next = $("#next7");
+
+  function validate(){
+    let ok = true;
+
+    const g = gmail.value.trim();
+    if (!isValidGmailLower(g)){
+      $("#errGmail").style.display="block"; ok=false;
+    } else { $("#errGmail").style.display="none"; }
+
+    if (!isValidMobile(mobile.value.trim())){
+      $("#errMobile").style.display="block"; ok=false;
+    } else { $("#errMobile").style.display="none"; }
+
+    if (edu.value.trim()==""){
+      $("#errEdu").style.display="block"; ok=false;
+    } else { $("#errEdu").style.display="none"; }
+
+    next.disabled = !ok;
+  }
+
+  [gmail, mobile, edu].forEach(el=>{
+    el.addEventListener("input", validate);
+    el.addEventListener("change", validate);
+  });
+
+  $("#prev7").addEventListener("click", ()=> showStep(6));
+  next.addEventListener("click", ()=> showStep(8));
+})();
+
+/* --------第8頁：導言C-------- */
+(function initStep8(){
+  $("#prev8").addEventListener("click", ()=> showStep(7));
+  $("#next8").addEventListener("click", ()=> showStep(9));
+})();
+
+/* --------第9頁：緊急聯絡人 驗證-------- */
+(function initStep9(){
+  const emgName = $("#emgName");
+  const emgRel = $("#emgRel");
+  const homePhone = $("#homePhone");
+  const emgMobile = $("#emgMobile");
+  const emgAddr = $("#emgAddr");
+  const next = $("#next9");
+
+  function validate(){
+    let ok = true;
+
+    if (emgName.value.trim()==""){ $("#errEmgName").style.display="block"; ok=false; }
+    else { $("#errEmgName").style.display="none"; }
+
+    if (emgRel.value.trim()==""){ $("#errEmgRel").style.display="block"; ok=false; }
+    else { $("#errEmgRel").style.display="none"; }
+
+    const hp = homePhone.value.trim();
+    if (!isValidHomePhone(hp)){ $("#errHomePhone").style.display="block"; ok=false; }
+    else { $("#errHomePhone").style.display="none"; }
+
+    if (!isValidMobile(emgMobile.value.trim())){ $("#errEmgMobile").style.display="block"; ok=false; }
+    else { $("#errEmgMobile").style.display="none"; }
+
+    const addr = emgAddr.value.trim();
+    if (addr==="" || addr.includes("同戶籍地")){ $("#errEmgAddr").style.display="block"; ok=false; }
+    else { $("#errEmgAddr").style.display="none"; }
+
+    next.disabled = !ok;
+  }
+
+  [emgName, emgRel, homePhone, emgMobile, emgAddr].forEach(el=>{
+    el.addEventListener("input", validate);
+    el.addEventListener("change", validate);
+  });
+
+  $("#prev9").addEventListener("click", ()=> showStep(8));
+  next.addEventListener("click", ()=> showStep(10));
+})();
+
+/* --------第10頁：眷屬加保 驗證 + 條件欄位-------- */
+(function initStep10(){
+  const depEnable = $("#depEnable");
+  const depFields = $("#depFields");
+  const depRel = $("#depRel");
+  const depName = $("#depName");
+  const depNid = $("#depNid");
+  const depBirth = $("#depBirth");
+  const next = $("#next10");
+
+  function toggleDep(){
+    const isYes = depEnable.value==="是";
+    depFields.style.display = isYes ? "block" : "none";
+    validate();
+  }
+
+  function validate(){
+    let ok = true;
+    if (!depEnable.value){ $("#errDepEnable").style.display="block"; ok=false; }
+    else { $("#errDepEnable").style.display="none"; }
+
+    if (depEnable.value==="是"){
+      if (depRel.value.trim()==""){ $("#errDepRel").style.display="block"; ok=false; } else $("#errDepRel").style.display="none";
+      if (depName.value.trim()==""){ $("#errDepName").style.display="block"; ok=false; } else $("#errDepName").style.display="none";
+      if (!isTenAlnum(depNid.value.trim())){ $("#errDepNid").style.display="block"; ok=false; } else $("#errDepNid").style.display="none";
+      if (!isValidRocDate(depBirth.value.trim())){ $("#errDepBirth").style.display="block"; ok=false; } else $("#errDepBirth").style.display="none";
+    } else {
+      /* 選否時，不檢查下列欄位 */
+      ["errDepRel","errDepName","errDepNid","errDepBirth"].forEach(id=>{ $("#"+id).style.display="none"; });
+    }
+    next.disabled = !ok;
+  }
+
+  depEnable.addEventListener("change", toggleDep);
+  [depRel, depName, depNid, depBirth].forEach(el=>{
+    el.addEventListener("input", validate);
+    el.addEventListener("change", validate);
+  });
+
+  $("#prev10").addEventListener("click", ()=> showStep(9));
+  next.addEventListener("click", ()=> showStep(11));
+})();
+
+/* --------第11頁：上傳說明-------- */
+(function initStep11(){
+  $("#prev11").addEventListener("click", ()=> showStep(10));
+  $("#next11").addEventListener("click", ()=> showStep(12));
+})();
+
+/* --------第12頁：上傳實作 驗證-------- */
+(function initStep12(){
+  const front = $("#idFront");
+  const back  = $("#idBack");
+  const checks = ["#chk1","#chk2","#chk3","#chk4"].map(sel=>$(sel));
+  const next = $("#next12");
+
+  function validate(){
+    let ok = true;
+
+    if (front.files && front.files.length>0){ $("#errFront").style.display="none"; }
+    else { $("#errFront").style.display="block"; ok=false; }
+
+    if (back.files && back.files.length>0){ $("#errBack").style.display="none"; }
+    else { $("#errBack").style.display="block"; ok=false; }
+
+    if (!checks.every(c=>c.checked)) ok=false;
+
+    next.disabled = !ok;
+  }
+
+  [front, back, ...checks].forEach(el=>{
+    el.addEventListener("change", validate);
+    el.addEventListener("input", validate);
+  });
+
+  $("#prev12").addEventListener("click", ()=> showStep(11));
+  next.addEventListener("click", ()=> showStep(13));
+})();
+
+/* --------第13頁：完成 & 再填-------- */
+(function initStep13(){
+  $("#restart").addEventListener("click", ()=> {
+    window.location.reload();
+  });
+})();
+
+/* --------全域：上一頁按鈕（各步已個別處理） & 初始顯示-------- */
+document.addEventListener("DOMContentLoaded", ()=>{
+  showStep(1);
+});
+</script>
+</body>
+</html>
