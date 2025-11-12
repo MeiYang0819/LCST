@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>📝 勞工名卡建檔表</title>
+  <title>📝勞工名卡建檔表</title>
 
   <style>
   :root {
@@ -55,14 +55,14 @@
     --panel-bg: linear-gradient(0deg,rgba(64,55,55,1) 0%, rgba(43,37,37,1) 37%, rgba(0,0,0,1) 100%); /* 預設灰黑 */
 
     /*//* --------第10頁：範例圖片尺寸/外觀（可自行調整；新增）--------*/*/
-    --sample-gap: 10px;         /* 左右/上下兩張圖片間距（可調） */
+    --sample-gap: 10px;         /* 左右兩張圖片之間的間距（可調） */
     --sample-max-h: 180px;      /* 圖片最大高度（可調：放不下自動縮小） */
     --sample-pad: 8px;          /* 每張圖外框內距（可調） */
     --sample-bg: rgba(255,255,255,0.04); /* 圖片外框底色（可調） */
     --sample-radius: 12px;      /* 圖片外框圓角（可調） */
 
-    /*（保留）--field-ink 原先使用；本版改為跟 ⏍ 提示同色：--muted */
-    --field-ink: #d1cfcf;
+    /* 新增：欄位實際字色（避免裝置上出現黑字看不到） */
+    --field-ink: var(--muted);  /* 新增調整：輸入框與下拉選單的文字顏色改成與 ⏍ 提示同色 */
   }
 
   /* 可選：如需自帶字型，將 woff2 檔放入 /fonts 並取消下列註解（新增）
@@ -76,7 +76,7 @@
   /* ===== 全站背景底色 ===== */
   html, body { height: 100%; margin: 0; overflow-x: hidden; }
   body {
-    /*//* --------全域字體堆疊（以源泉圓體為主；新增）--------*/*/
+    /*//* --------全域字體堆疊（以源泉圓體為主）--------*/*/
     font-family:
       "GenSenRounded",
       "Yuanti TC",
@@ -142,6 +142,8 @@
     font-size: var(--title-size);
     text-align: center;
     letter-spacing: 0.5px;
+    /* 新增：勞工名卡建檔表標題粗體+陰影效果（可調整或刪除） */
+    text-shadow: 0 0 6px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.6);
   }
   .header-step {
     position: absolute;
@@ -232,24 +234,24 @@
     border-radius: var(--control-radius);
     outline: none;
 
-    /*（依需求）輸入框/選單內文字顏色＝ ⏍ 提示同色 */
-    color: var(--muted);
+    /* 重要：輸入框/選單內文字改為你指定的顏色（與 ⏍ 提示一致） */
+    color: var(--field-ink);
     font-size: var(--input-size);
 
     height: var(--input-height);
     box-sizing: border-box;
   }
 
-  /* 下拉選單與選項文字都強制為 ⏍ 同色（避免裝置預設黑字） */
+  /* 下拉選單的選項文字也強制為 var(--field-ink)（避免裝置預設黑字） */
   select, select option { 
-    color: var(--muted) !important; 
+    color: var(--field-ink) !important; 
     background: var(--control-bg);
   }
 
-  /* placeholder 也同 ⏍ 顏色 */
+  /* placeholder 也一併改成 var(--field-ink)，避免看不到 */
   input::placeholder { 
     font-size: var(--placeholder-size);
-    color: var(--muted);
+    color: var(--field-ink);
   }
 
   input:focus, select:focus {
@@ -263,27 +265,19 @@
   /* 讓「只有是/否」的頁面維持與內容相同大小（不受 label 13px 影響） */
   .radio-row label { font-size: var(--content-size); font-weight: 700; }
 
-  /* iOS Safari 自動放大防呆（僅作用在登入遮罩的密碼欄；避免一開始整頁放大；保留註解） */
-  /* 
+  /* iOS Safari 自動放大防呆（僅作用在登入遮罩的密碼欄；避免一開始整頁放大）
+     ＋ 新增：一般輸入框與下拉選單字級設為 16px 以避免點擊時自動放大畫面（可調整 ≥16） */
   @supports (-webkit-touch-callout: none) {
-    input[type="text"], 
-    input[type="email"], 
-    input[type="password"],
-    textarea { font-size: 16px; } 
-  }
-  */
-  /*（新增）iOS 全欄位防放大：在 iOS 上把可輸入元件字級設為 16px，避免點擊自動縮放 */
-  @supports (-webkit-touch-callout: none) {
+    .gate #gatePwd { font-size: 16px; }
+    /* 新增：避免 iOS 點文字輸入框/選單時自動放大畫面 */
     input[type="text"],
     input[type="email"],
-    input[type="password"],
-    input[type="file"],
-    select,
-    textarea { font-size: 16px; }
-    .gate #gatePwd { font-size: 16px; } /* 登入鎖同樣處理 */
+    select {
+      font-size: 16px; /* 若覺得太大，可改成 15~17 測試，需 ≥16 才能阻止放大 */
+    }
   }
 
-  /* 強制 select 字級與 ⏍ 同色（覆蓋可能的環境差異；保留註解） */
+  /* 強制 select 仍用 12px 與 ⏍ 同色（覆蓋可能的環境差異；保留註解） */
   select { font-size: var(--input-size) !important; }
 
   /* 檔案上傳（同高） */
@@ -321,23 +315,34 @@
     display: inline-flex; align-items: center;
   }
 
-  /* 小縮圖預覽（新增） */
-  .file-preview{
-    display:none;
-    margin-top: 8px;
-    max-height: 120px;
-    width: 100%;
-    object-fit: contain;
-    border: 1px dashed var(--control-border);
+  /* 新增：檔案上傳前的小縮圖預覽區塊（可調整大小或刪除） */
+  .file-preview {
+    margin-top: 4px;
+    min-height: 40px;         /* 沒有圖時佔一點高度，版面不跳動（可調整或移除） */
+  }
+  .file-preview .file-thumb {
+    max-width: 120px;         /* 小縮圖最大寬度（可調整） */
+    max-height: 80px;         /* 小縮圖最大高度（可調整） */
     border-radius: 8px;
-    padding: 4px;
-    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--control-border);
+    display: block;
+  }
+  .file-preview .file-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
   }
 
   /* 只縮小「上一頁 / 下一頁」兩顆按鈕，也套用到完成鍵 */
   .btn--nav {
     min-height: var(--nav-btn-min-h);
     padding: var(--nav-btn-pad);
+  }
+  /* 新增：上一頁 / 下一頁 / 完成 三顆按鈕寬度統一（可調整數值） */
+  #btnPrev,
+  #btnNext,
+  #btnFinish {
+    min-width: 80px; /* 若想三顆更寬，可改成 100 或 120 */
   }
 
   /* 底部固定操作列（全頁共用） */
@@ -423,10 +428,10 @@
   /* 第13頁：完成頁 */
   .step[data-page="13"]{ --title-size: 15px; --content-size: 12px; }
 
-  /* 第10頁：範例圖片樣式 —— 改為上下排列（原本為左右兩欄） */
+  /* 第10頁：範例圖片樣式（左右排、可自動縮小） */
   .samples { 
     display: grid;
-    grid-template-columns: 1fr; /* 改為單欄：上下排列 */
+    grid-template-columns: 1fr 1fr; /* 左右兩欄，固定不換行（需求：不要上下） */
     gap: var(--sample-gap);
     align-items: start;
     margin-top: 10px; /* 與上方文字間距 */
@@ -453,7 +458,13 @@
     text-align: center;
   }
 
-  /* ====== 登入遮罩樣式（沿用樣式當密碼鎖） ====== */
+  /* 新增：依照最新需求，第10頁身分證範例改為「上下排列」而非左右
+     透過更精準選擇器覆蓋 .samples 原本的 grid-template-columns */
+  .step[data-page="10"] .samples {
+    grid-template-columns: 1fr; /* 改為單欄，上下排列 */
+  }
+
+  /* ====== 登入遮罩樣式 ====== */
   .gate {
     position: fixed; inset: 0; z-index: 9999;
     background: rgba(0,0,0,0.75);
@@ -711,7 +722,7 @@
         </div>
       </section>
 
-      <!-- 第9頁：眷屬加保（條件欄位；生日同 7 碼規則） -->
+      <!-- 第9頁：眷屬加保 -->
       <section class="step" data-page="9" id="step-9">
         <div class="row">
           <label for="depEnable">© 眷屬是否依附加保</label>
@@ -750,7 +761,7 @@
         </div>
       </section>
 
-      <!-- 第10頁：⏫ 上傳檔案 -->
+      <!-- 第10頁：上傳檔案 -->
       <section class="step" data-page="10" id="step-10">
         <h2>⏫ 上傳檔案</h2>
         <ol class="note-list">
@@ -759,7 +770,7 @@
           <li>檔案須符合本公司限定規格.</li>
         </ol>
 
-        <!-- //* --------第10頁：範例圖片區（改為上下排列）--------*// -->
+        <!-- //* --------第10頁：範例圖片區--------*// -->
         <div class="samples" aria-label="身分證範本">
           <figure class="sample-box">
             <img class="sample-img" src="assets/身分證範本-正面.jpg" alt="❗️範例-身分證上傳限定規格-正面">
@@ -793,8 +804,8 @@
           </label>
           <div class="file-name" id="nameFront">尚未選取檔案</div>
         </div>
-        <!-- 小縮圖預覽：正面（新增） -->
-        <img id="previewFront" class="file-preview" alt="預覽：身分證正面（影像檔顯示）" />
+        <!-- 新增：身分證正面上傳前的小縮圖預覽區（可依需求調整或刪除） -->
+        <div class="file-preview" id="previewFront"></div>
 
         <div class="error" id="errFront">⚠️ 請選擇身分證正面檔案</div>
 
@@ -806,8 +817,8 @@
           </label>
           <div class="file-name" id="nameBack">尚未選取檔案</div>
         </div>
-        <!-- 小縮圖預覽：反面（新增） -->
-        <img id="previewBack" class="file-preview" alt="預覽：身分證反面（影像檔顯示）" />
+        <!-- 新增：身分證反面上傳前的小縮圖預覽區（可依需求調整或刪除） -->
+        <div class="file-preview" id="previewBack"></div>
 
         <div class="error" id="errBack">⚠️ 請選擇身分證反面檔案</div>
 
@@ -843,7 +854,7 @@
 
       <!-- 第13頁：完成 -->
       <section class="step" data-page="13" id="step-13">
-        <h2>✅ 全數完成</h2>
+        <h2>✅ 全數完成</h2> <!-- 修正：合法 h2 標籤 -->
         <div style="text-align:center; line-height:1.8;">
           © 勞工名卡登記表
           <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;">
@@ -877,7 +888,6 @@
   </div>
 
 <script>
-/* <======== 檔案用途：系統共用常數、簽章工具、小工具、固定頁籤定位 ======== > */
 
 /* --------系統常數（可調）-------- */
 const TOTAL_STEPS = 13;  /* 總頁數（顯示用；更新為 13；新增） */
@@ -886,7 +896,7 @@ const ACCESS_PWD = "19860819"; /* 新增：進入密碼（可調） */
 const $  = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
-/* 新增：表單時間戳（建立/更新） */
+/* --------表單時間戳）-------- */
 const FORM_META = { createdAt: null, updatedAt: null };
 function fmtTW(d){
   try{
@@ -905,7 +915,17 @@ function updateStampUI(){
   if(u){ u.textContent = FORM_META.updatedAt ? fmtTW(FORM_META.updatedAt) : "—"; }
 }
 
-/* ====== 密碼進入遮罩（移除信箱登入，改為密碼驗證；置中已於 CSS 處理） ====== */
+/* 新增：表單鎖定旗標（完成後禁止再修改/返回；可依需求調整哪些元素要鎖） */
+let FORM_LOCKED = false;
+function lockForm(){
+  FORM_LOCKED = true;
+  /* 新增：將所有 input / select / button 鎖定（若有需要保留可操作的按鈕，可在此排除） */
+  document.querySelectorAll("input, select, button").forEach(el => {
+    el.disabled = true;
+  });
+}
+
+/* ====== 密碼進入遮罩 ====== */
 (function passGateInit(){
   const gate = $("#passGate"), pwd = $("#gatePwd"), btn = $("#gatePwdStart"), err=$("#gatePwdErr");
   if(!gate) return;
@@ -986,6 +1006,30 @@ function isValidRoc7(str){
   return dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
 }
 
+/* 新增：檔案上傳前的小縮圖預覽（僅預覽圖片檔；PDF 顯示文字提示即可） */
+function updateFilePreview(inputEl, previewId){
+  const box = document.getElementById(previewId);
+  if(!box) return;
+  box.innerHTML = ""; /* 先清空舊預覽 */
+
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+
+  if(file.type && file.type.startsWith("image/")){
+    const img = document.createElement("img");
+    img.className = "file-thumb";     /* 對應 .file-preview .file-thumb 樣式 */
+    img.alt = "上傳預覽縮圖";
+    img.src = URL.createObjectURL(file);
+    box.appendChild(img);
+  } else {
+    /* 非圖片檔（例如 PDF）顯示簡短文字，避免使用者以為壞掉 */
+    const note = document.createElement("div");
+    note.className = "file-note";
+    note.textContent = "非圖片檔，預覽略過（檔名已顯示於右側）";
+    box.appendChild(note);
+  }
+}
+
 /* ====== 動態前綴驗證（只有「不可能成立」或 onblur 才顯示錯誤） ====== */
 function mobilePrefixOK(v){
   // 目標格式：09dd-ddd-ddd
@@ -1042,6 +1086,7 @@ function shouldShowErr(id, submit){ return !!submit || !!TOUCHED[id]; }
 let currentPage = 1;
 function pad2(n){ return String(n).padStart(2,'0'); }
 function updateHeaderStep(){
+  const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnFinish=$("#btnFinish");
   $("#headerStep").textContent = `第${pad2(currentPage)}頁/共${TOTAL_STEPS}頁`;
   const group = currentPage<=6 ? "g1" : (currentPage<=9 ? "g2" : "g3");
   $(".container").setAttribute("data-group", group);
@@ -1239,6 +1284,15 @@ function validatePage(n, submit=false){
 /* ====== 底部操作列：狀態控制 ====== */
 function updateNavState(){
   const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnFinish=$("#btnFinish");
+
+  /* 新增：若已鎖定表單，直接把按鈕全部 disable 並中止更新邏輯 */
+  if(FORM_LOCKED){
+    if(btnPrev) btnPrev.disabled = true;
+    if(btnNext) btnNext.disabled = true;
+    if(btnFinish) btnFinish.disabled = true;
+    return;
+  }
+
   btnPrev.disabled = currentPage<=1;
   btnFinish.style.display = currentPage===TOTAL_STEPS ? "inline-block" : "none";
   btnNext.style.display   = currentPage===TOTAL_STEPS ? "none" : "inline-block";
@@ -1256,10 +1310,10 @@ function clearCurrentPage(){
     $("#idFront").value=""; $("#idBack").value="";
     $("#nameFront").textContent="尚未選取檔案";
     $("#nameBack").textContent="尚未選取檔案";
-    /* 同步清空預覽（新增） */
-    const pf=$("#previewFront"), pb=$("#previewBack");
-    if(pf){ pf.src=""; pf.style.display="none"; }
-    if(pb){ pb.src=""; pb.style.display="none"; }
+    /* 新增：清除檔案縮圖預覽 */
+    const pf = $("#previewFront"), pb = $("#previewBack");
+    if(pf) pf.innerHTML = "";
+    if(pb) pb.innerHTML = "";
   }
   cur.querySelectorAll('.error').forEach(e=> e.style.display="none");
   if(cur.id==="step-1"){ $("#exitMsg").classList.remove("show"); }
@@ -1380,7 +1434,7 @@ function bindLiveValidation(){
     markTouched('agreeUpload'); updateNavState();
   }));
 
-  /* 第11頁 */
+  /* 第11頁：檔案上傳 + 檔名顯示 + 新增縮圖預覽 */
   ["#idFront","#idBack"].forEach(sel=>{
     const el=$(sel); if(!el) return;
     el.addEventListener('change', ()=>{
@@ -1388,26 +1442,13 @@ function bindLiveValidation(){
       $("#nameFront").textContent = ($("#idFront").files?.[0]?.name)||"尚未選取檔案";
       $("#nameBack").textContent  = ($("#idBack").files?.[0]?.name)||"尚未選取檔案";
 
-      /*（新增）預覽小圖：僅顯示影像檔 */
-      const pf = $("#previewFront");
-      const pb = $("#previewBack");
-      const f  = $("#idFront").files?.[0] || null;
-      const b  = $("#idBack").files?.[0] || null;
-
-      function setPreview(imgEl, file){
-        if(!imgEl) return;
-        if(file && file.type && file.type.startsWith("image/")){
-          const url = URL.createObjectURL(file);
-          imgEl.src = url;
-          imgEl.style.display = "block";
-          imgEl.onload = ()=> URL.revokeObjectURL(url);
-        }else{
-          imgEl.src = "";
-          imgEl.style.display = "none";
-        }
+      /* 新增：依照不同欄位更新對應的小縮圖預覽 */
+      if(el.id === "idFront"){
+        updateFilePreview(el, "previewFront");
       }
-      setPreview(pf, f);
-      setPreview(pb, b);
+      if(el.id === "idBack"){
+        updateFilePreview(el, "previewBack");
+      }
 
       updateNavState();
     });
@@ -1429,9 +1470,11 @@ function bindLiveValidation(){
 
 function bindActionBar(){
   $("#btnPrev").addEventListener("click", ()=>{
+    if(FORM_LOCKED) return; /* 新增：若已鎖定，阻止返回操作 */
     if(currentPage>1){ showStep(currentPage-1); }
   });
   $("#btnNext").addEventListener("click", ()=>{
+    if(FORM_LOCKED) return; /* 新增：若已鎖定，阻止前進操作 */
     const ok = validatePage(currentPage, /*submit*/ true);
     if(ok && currentPage<TOTAL_STEPS){
       setUpdatedNow(); /* 每次過頁標記更新時間 */
@@ -1439,9 +1482,13 @@ function bindActionBar(){
     }
   });
   $("#btnFinish").addEventListener("click", ()=>{
+    if(FORM_LOCKED) return; /* 新增：若已鎖定，避免重複送出 */
     if(currentPage===TOTAL_STEPS){
       setUpdatedNow(); /* 完成時也標記更新時間 */
-      alert("✅ 已完成,歡迎開始邁入地獄😈");
+      alert("✅ 已完成,歡迎邁入地獄😈");
+      /* 新增：按下完成後鎖定整份表單，禁止再返回或修改 */
+      lockForm();
+      updateNavState();
     }
   });
 }
