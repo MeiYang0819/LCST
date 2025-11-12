@@ -24,10 +24,10 @@
     --footer-size: 11px;        /* 頁尾字級（可調） */
 
     /*//* --------全域字級控制變數（可自行調整；新增）--------*/*/
-    --label-size: 14px;         /* 欄位標題字級（例如：公司名稱；可調） */
+    --label-size: 13px;         /* 欄位標題字級（例如：公司名稱；可調） */
     --hint-size: 12px;          /* 小字提示（label small；可調） */
     --input-size: 12px;         /* 輸入框/選單中文字級（可調） */
-    --placeholder-size: 12px;   /* placeholder 字級（可調） */
+    --placeholder-size: var(--hint-size);   /*  ← 所有輸入框/選單字級 跟小備註一致  */
     --error-size: 12px;         /* 錯誤訊息字級（可調） */
 
     --section-gap: 16px;        /* 區塊與段落間距（可調） */
@@ -230,14 +230,17 @@
     border: 1px solid var(--control-border);
     border-radius: var(--control-radius);
     outline: none;
-    color: var(--ink);
+    color: var(--muted);           /* ← 改成與小備註同色 */ 
     /*//* --------全域：輸入框內文字字級（新增）--------*/*/
-    font-size: var(--input-size, var(--content-size));
+    font-size: var(--input-size);  /* ← 已與小備註同大小 */
     height: var(--input-height);
     box-sizing: border-box;
   }
   /*//* --------全域：placeholder 字級（新增）--------*/*/
-  input::placeholder { font-size: var(--placeholder-size, var(--input-size, var(--content-size))); }
+  input::placeholder,textarea::placeholder {
+  color: var(--muted);   /* ← 與小備註同色 */
+  opacity: .9;
+}
 
   input:focus, select:focus {
     border-color: var(--control-focus);
