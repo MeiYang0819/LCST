@@ -52,9 +52,8 @@
     --actionbar-pad-y: 6px;     /* 操作列上下內距（可調） */
     --actionbar-pad-x: 12px;    /* 操作列左右內距（可調） */
 
-    /* 新增：面板背景變數（由 data-group 控制） */
-    --panel-bg: linear-gradient(0deg,rgba(64,55,55,1) 0%, rgba(43,37,37,1) 37%, rgba(0,0,0,1) 100%); /* 預設灰黑 */
-
+    /* 新增：面板背景變數（由 data-* 控制） */
+    --panel-bg: linear-gradient(0deg,rgba(43,37,37,1) 0%, rgba(0,0,0,1) 100%); /* 預設黑 */
     /*//* --------第10頁：範例圖片尺寸/外觀（可自行調整；新增）--------*/*/
     --sample-gap: 10px;         /* 圖片之間的間距（可調） */
     --sample-max-h: 180px;      /* 圖片最大高度（可調） */
@@ -97,12 +96,16 @@
     display: grid;
     grid-template-rows: auto 1fr auto auto; /* header / content / actionbar / footer */
     overflow: hidden;
-    background: var(--panel-bg);
+    background: var(--panel-bg) !important; /* 以變數為最終背景 */
   }
-  /* 面板背景分組（依頁碼切換） */
-  .container[data-group="g1"]{ --panel-bg: linear-gradient(0deg,rgba(64,55,55,1) 0%, rgba(43,37,37,1) 43%, rgba(0,0,0,1) 100%); }
-  .container[data-group="g2"]{ --panel-bg: linear-gradient(0deg,rgba(117, 16, 16, 1) 0%, rgba(98, 13, 13, 1) 22%, rgba(89, 11, 11, 1) 100%); }
-  .container[data-group="g3"]{ --panel-bg: linear-gradient(0deg,rgba(105,30,61,1) 0%, rgba(75,14,61,1) 83%, rgba(56,4,61,1) 100%); }
+
+  /* ===== 新增：用 data-scheme 控制黑/紫兩種底色（取代原本紅色） ===== */
+  .container[data-scheme="black"]{
+    --panel-bg: linear-gradient(0deg,rgba(43,37,37,1) 0%, rgba(0,0,0,1) 100%);
+  }
+  .container[data-scheme="purple"]{
+    --panel-bg: linear-gradient(0deg,rgba(105,30,61,1) 0%, rgba(75,14,61,1) 83%, rgba(56,4,61,1) 100%);
+  }
 
   /* 頁首（中間置中標題；右上角顯示步驟） */
   .header {
@@ -141,7 +144,7 @@
   .step h2 {
     margin: 0 0 10px 0;
     font-size: var(--title-size);
-    text-align: center;
+    text-align: center; /* 標題置中（最後一頁也會套用） */
     font-weight: 800;
   }
 
@@ -158,6 +161,7 @@
     margin-top: var(--section-gap);
   }
 
+  /* 第1頁特別：整組置中 + 選項置中 */
   .center-block { display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; }
   .radio-row { display:flex; justify-content:center; gap:18px; flex-wrap:wrap; }
   .exit {
@@ -251,7 +255,7 @@
   body.kb-open .actionbar { opacity:0; pointer-events:none; transform:translateY(0)!important; }
   body.kb-open .content { padding-bottom: calc(var(--footer-h) + 16px); }
 
-  /* ========== 每頁獨立設定區（可逐頁覆蓋） ========== */
+  /* ========== 每頁獨立設定區（可逐頁覆蓋；字級） ========== */
   .step[data-page="1"]{ --title-size: 15px; --content-size: 12px; }
   .step[data-page="2"]{ --title-size: 15px; --content-size: 12px; }
   .step[data-page="3"]{ --title-size: 15px; --content-size: 12px; }
@@ -301,9 +305,9 @@
     </div>
   </div>
 
-  <div class="container" role="region" aria-label="勞報建檔表 分步表單" data-group="g1">
+  <div class="container" role="region" aria-label="勞報建檔表 分步表單" data-scheme="black">
     <header class="header">
-      <!-- 標題：依你要求改為「勞報建檔表」、粗體＋陰影 -->
+      <!-- 標題：依你要求「勞報建檔表」、粗體＋陰影 -->
       <div class="header-title">📝 勞報建檔表</div>
       <div class="header-step" id="headerStep">第01頁/共13頁</div>
     </header>
@@ -566,6 +570,7 @@
           <li>檔案須符合本公司限定規格.</li>
         </ol>
 
+        <!-- 範例改上下 -->
         <div class="samples" aria-label="身分證範本">
           <figure class="sample-box">
             <img class="sample-img" src="assets/身分證範本-正面.jpg" alt="❗️範例-身分證上傳限定規格-正面">
@@ -595,7 +600,7 @@
             <span class="file-btn">選擇檔案</span>
             <input id="idFront" type="file" accept=".pdf,image/*" />
           </label>
-          <div class="file-name" id="nameFront">
+        <div class="file-name" id="nameFront">
             <img class="thumb" id="thumbFront" alt="縮圖預覽"><span id="nameFrontTxt">尚未選取檔案</span>
           </div>
         </div>
@@ -626,7 +631,7 @@
         </div>
       </section>
 
-      <!-- 第12頁：❗️資料送出前-核檢區（照你的 7 條文字＋前面加勾勾；不顯示錯誤） -->
+      <!-- 第12頁：❗️資料送出前-核檢區（7 條勾選；不顯示錯誤） -->
       <section class="step" data-page="12" id="step-12">
         <h2>❗️資料送出前-核檢區</h2>
         <div class="fieldset">
@@ -639,13 +644,12 @@
             <label><input type="checkbox" id="preF"> 5-1. 若勾選後還填寫錯誤，請自負責任.</label>
             <label><input type="checkbox" id="preG"> 提交表單後，請完成截圖回報機制.</label>
           </div>
-          <!-- 依你的要求：未全勾不顯示錯誤訊息，所以拿掉 err 區 -->
         </div>
       </section>
 
-      <!-- 第13頁：完成 -->
+      <!-- 第13頁：完成（標題置中；到此自動鎖定、無上一頁/完成） -->
       <section class="step" data-page="13" id="step-13">
-        <h2✅ >全數完成</h2>
+        <h2>✅ 全數完成</h2>
         <div style="text-align:center; line-height:1.8;">
           © 勞報建檔表
           <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;">
@@ -666,7 +670,6 @@
       </div>
       <div class="right-actions" style="display:flex; gap:10px;">
         <button class="btn btn--nav" id="btnNext" type="button">下一頁</button>
-        <!-- 調整：完成按鈕加上 btn--nav，與上一頁/下一頁同尺寸 -->
         <button class="btn btn--nav" id="btnFinish" type="button">完成</button>
       </div>
     </div>
@@ -806,17 +809,35 @@ const TOUCHED = Object.create(null);
 function markTouched(id){ if(id) TOUCHED[id] = true; }
 function shouldShowErr(id, submit){ return !!submit || !!TOUCHED[id]; }
 
-/* ====== 步驟顯示與面板背景分組 ====== */
+/* ====== 步驟顯示與背景配色 ====== */
 let currentPage = 1;
-let IS_LOCKED = false; /* 完成後鎖定 */
+let IS_LOCKED = false; /* 完成或最後頁進入後鎖定 */
 function pad2(n){ return String(n).padStart(2,'0'); }
+
+/* 指定頁為紫色：1,3,7,10,12；其餘黑色 */
+function pageIsPurple(n){ return [1,3,7,10,12].includes(n); }
+
 function updateHeaderStep(){
   $("#headerStep").textContent = `第${pad2(currentPage)}頁/共${TOTAL_STEPS}頁`;
-  const group = currentPage<=6 ? "g1" : (currentPage<=9 ? "g2" : "g3");
-  $(".container").setAttribute("data-group", group);
+  const scheme = pageIsPurple(currentPage) ? "purple" : "black";
+  $(".container").setAttribute("data-scheme", scheme);
 }
+
+function lockAllAndHideNav(){
+  IS_LOCKED = true;
+  // 停用所有可互動元素
+  document.querySelectorAll('input, select, button, textarea').forEach(el=>{
+    el.disabled = true;
+  });
+  // 導航按鈕隱藏（最後一頁不要上一頁/完成）
+  const prev=$("#btnPrev"), next=$("#btnNext"), fin=$("#btnFinish");
+  if(prev){ prev.style.display="none"; }
+  if(next){ next.style.display="none"; }
+  if(fin){ fin.style.display="none"; }
+}
+
 function showStep(pageNumber){
-  if(IS_LOCKED) return; /* 完成後不可跳頁 */
+  if(IS_LOCKED && pageNumber!==TOTAL_STEPS) return; /* 鎖定後不可離開完成頁 */
   $$(".step").forEach(s=>s.classList.remove("active"));
   const el = document.getElementById(`step-${pageNumber}`);
   if(el) el.classList.add("active");
@@ -824,9 +845,21 @@ function showStep(pageNumber){
   updateHeaderStep();
   $("#content").scrollTo({ top: 0, behavior: "instant" });
   updateNavState();
+
+  /* 新增：到最後一頁即自動鎖定、隱藏上一頁與完成 */
+  if(pageNumber===TOTAL_STEPS){
+    setUpdatedNow();
+    // 等一個 event loop 讓畫面切到最後頁，再鎖定
+    setTimeout(()=>{ lockAllAndHideNav(); updateNavState(); }, 0);
+  }
 }
 
 /* ====== 各頁驗證（submit=false：不顯示紅字；true：顯示紅字） ====== */
+function isValidGmailOnSubmit(val, submit){
+  val = (val||"").toLowerCase().trim();
+  return submit ? /^[a-z0-9._%+-]+@gmail\.com$/.test(val) : true;
+}
+
 function validatePage(n, submit=false){
   switch(n){
     case 1: {
@@ -905,10 +938,7 @@ function validatePage(n, submit=false){
     }
     case 6: {
       let ok = true;
-      const el = $("#gmail");
-      let val = (el.value||"").toLowerCase().trim();
-      /* 只有在提交（按下一頁）時才檢查，避免你還沒打完就跳錯 */
-      const gOK = /^[a-z0-9._%+-]+@gmail\.com$/.test(val);
+      const gOK = isValidGmailOnSubmit($("#gmail").value, submit);
       $("#errGmail").style.display = (submit && !gOK) ? "block" : "none";
       if(!gOK) ok=false;
 
@@ -1009,11 +1039,14 @@ function validatePage(n, submit=false){
 /* ====== 底部操作列：狀態控制 ====== */
 function updateNavState(){
   const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnFinish=$("#btnFinish");
+  const onLast = currentPage===TOTAL_STEPS;
+
   btnPrev.disabled = IS_LOCKED || currentPage<=1;
-  btnFinish.style.display = currentPage===TOTAL_STEPS ? "inline-block" : "none";
-  btnNext.style.display   = currentPage===TOTAL_STEPS ? "none" : "inline-block";
-  btnNext.disabled = IS_LOCKED || !validatePage(currentPage, /*submit*/ false);
-  btnFinish.disabled = IS_LOCKED || currentPage!==TOTAL_STEPS;
+  btnNext.style.display   = onLast ? "none" : "inline-block";
+  btnFinish.style.display = onLast ? "none" : "inline-block"; /* 最後一頁不要完成 */
+  btnNext.disabled   = IS_LOCKED || !validatePage(currentPage, /*submit*/ false);
+  btnFinish.disabled = IS_LOCKED || onLast || currentPage!==TOTAL_STEPS; /* 最後一頁直接隱藏，不使用 */
+  if(onLast){ btnPrev.style.display="none"; } else { btnPrev.style.display="inline-block"; }
 }
 
 /* 清除當頁（函式保留但按鈕已移除） */
@@ -1144,28 +1177,17 @@ function autoFitActionbarHeight(){
 
 /* ====== 導航/完成 ====== */
 function bindActionBar(){
-  $("#btnPrev").addEventListener("click", ()=>{ if(currentPage>1){ showStep(currentPage-1); } });
+  $("#btnPrev").addEventListener("click", ()=>{ if(!IS_LOCKED && currentPage>1){ showStep(currentPage-1); } });
   $("#btnNext").addEventListener("click", ()=>{
+    if(IS_LOCKED) return;
     const ok = validatePage(currentPage, /*submit*/ true);
     if(ok && currentPage<TOTAL_STEPS){ setUpdatedNow(); showStep(currentPage+1); }
   });
   $("#btnFinish").addEventListener("click", ()=>{
-    if(currentPage===TOTAL_STEPS){
-      setUpdatedNow();
-      /* 完成後：全站鎖定，無法返回或修改 */
-      IS_LOCKED = true;
-      // 停用所有可互動元素
-      document.querySelectorAll('input, select, button, textarea').forEach(el=>{
-        if(el.id!=="btnFinish") el.disabled = true;
-      });
-      // 停用導覽按鈕與隱藏上一頁/下一頁
-      $("#btnPrev").disabled = true;
-      $("#btnNext").disabled = true;
-      $("#btnPrev").style.display = "none";
-      $("#btnNext").style.display = "none";
-      alert("✅ 已完成，表單已鎖定。");
-      updateNavState();
-    }
+    /* 仍保留：若未走到最後一頁就想鎖定，可手動按完成（一般流程用不到） */
+    if(IS_LOCKED) return;
+    setUpdatedNow();
+    showStep(TOTAL_STEPS); /* 直接導到完成頁，並由 showStep 觸發鎖定 */
   });
 }
 
