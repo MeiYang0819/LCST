@@ -2,9 +2,9 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <!-- 調整：加上 id 方便 JS 在聚焦/離焦時鎖定縮放，解決 iOS 輸入時放大 -->
-  <meta id="viewportMeta" name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5" />
-  <title>勞工名卡建檔表｜Start Work System Test / Labor Card System Test</title>
+  <!-- 鎖縮放：避免打字後需要自行縮小；搭配 iOS 聚焦字級=16 一起使用 -->
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
+  <title>勞報建檔表｜Start Work System Test / Labor Card System Test</title>
 
   <style>
   :root {
@@ -13,10 +13,7 @@
     --radius: 16px;             /* 面板圓角（可調） */
     --border: #2a2a2a;          /* 邊框色（可調） */
     --ink: #eaeaea;             /* 主要文字色（可調） */
-
-    /* 調整：與 ⏍ 小備註一致的字色 */
-    --muted: #d1cfcf;           /* 次要文字色（可調） */
-
+    --muted: #dfdfdf;           /* 次要文字色（與 ⏍ 同色） ← 依需求改這一行 */
     --danger: #facc15;          /* 錯誤色（可調；淡黃色） */
     --ok: #22c55e;              /* 成功/通過色（可調） */
     --accent: #60a5fa;          /* 重點色/聚焦邊框（可調） */
@@ -44,7 +41,7 @@
     --input-height: 38px;       /* 控制項高度（讓框框同高；可調） */
 
     --actionbar-h: 64px;        /* 底部固定操作列高度（可調；JS 覆蓋實際高度） */
-    --footer-h: 44px;           /* 頁尾高度（可調） */
+    --footer-h: 44px;           /* 頁尾字級（可調） */
     --kv-offset: 0px;           /* 鍵盤彈出時向上位移量（JS 寫入） */
 
     /* 新增：上一頁/下一頁縮小用（可調） */
@@ -55,29 +52,19 @@
     --actionbar-pad-y: 6px;     /* 操作列上下內距（可調） */
     --actionbar-pad-x: 12px;    /* 操作列左右內距（可調） */
 
-    /* 新增：面板背景變數（由 data-group 控制） */
-    --panel-bg: linear-gradient(0deg,rgba(64,55,55,1) 0%, rgba(43,37,37,1) 37%, rgba(0,0,0,1) 100%); /* 預設灰黑 */
-
+    /* 新增：面板背景變數（由 data-* 控制） */
+    --panel-bg: linear-gradient(0deg,rgba(43,37,37,1) 0%, rgba(0,0,0,1) 100%); /* 預設黑 */
     /*//* --------第10頁：範例圖片尺寸/外觀（可自行調整；新增）--------*/*/
-    --sample-gap: 10px;         /* 左右/上下兩張圖片之間的間距（可調） */
-    --sample-max-h: 180px;      /* 圖片最大高度（可調：放不下自動縮小） */
+    --sample-gap: 10px;         /* 圖片之間的間距（可調） */
+    --sample-max-h: 180px;      /* 圖片最大高度（可調） */
     --sample-pad: 8px;          /* 每張圖外框內距（可調） */
     --sample-bg: rgba(255,255,255,0.04); /* 圖片外框底色（可調） */
     --sample-radius: 12px;      /* 圖片外框圓角（可調） */
   }
 
-  /* 可選：如需自帶字型，將 woff2 檔放入 /fonts 並取消下列註解（新增）
-  @font-face{
-    font-family: "GenSenRounded"; /* 源泉圓體（示意） */
-    src: url("fonts/GenSenRounded-Normal.woff2") format("woff2");
-    font-weight: 400; font-style: normal; font-display: swap;
-  }
-  */
-
   /* ===== 全站背景底色 ===== */
   html, body { height: 100%; margin: 0; overflow-x: hidden; }
   body {
-    /*//* --------全域字體堆疊（以源泉圓體為主；新增）--------*/*/
     font-family:
       "GenSenRounded",
       "Yuanti TC",
@@ -109,27 +96,16 @@
     display: grid;
     grid-template-rows: auto 1fr auto auto; /* header / content / actionbar / footer */
     overflow: hidden;
-    background: linear-gradient(0deg,rgba(64,55,55,1) 0%, rgba(43,37,37,1) 37%, rgba(0,0,0,1) 100%);
-  }
-  /* 面板背景分組（依頁碼切換） */
-  .container[data-group="g1"]{
-    /*//* --------配色（第1~6頁：灰黑；可自行調整）--------*/*/
-    background: linear-gradient(0deg,rgba(64,55,55,1) 0%, rgba(43,37,37,1) 43%, rgba(0,0,0,1) 100%);
-  }
-  .container[data-group="g2"]{
-    /*//* --------配色（第7~9頁：紅系；可自行調整）--------*/*/
-    background: linear-gradient(0deg,rgba(117, 16, 16, 1) 0%, rgba(98, 13, 13, 1) 22%, rgba(89, 11, 11, 1) 100%);
-  }
-  .container[data-group="g3"]{
-    /*//* --------配色（第10~13頁：紫系；可自行調整；已擴至第13頁）--------*/*/
-    background: linear-gradient(0deg,rgba(105,30,61,1) 0%, rgba(75,14,61,1) 83%, rgba(56,4,61,1) 100%);
+    background: var(--panel-bg) !important; /* 以變數為最終背景 */
   }
 
-  /* ===== 新增：以 CSS 變數強制依 data-group 套色（確保覆蓋） ===== */
-  .container { background: var(--panel-bg) !important; } /* 確保以變數為最終背景 */
-  .container[data-group="g1"]{ --panel-bg: linear-gradient(0deg,rgba(64,55,55,1) 0%, rgba(43,37,37,1) 43%, rgba(0,0,0,1) 100%); }
-  .container[data-group="g2"]{ --panel-bg: linear-gradient(0deg,rgba(117, 16, 16, 1) 0%, rgba(98, 13, 13, 1) 22%, rgba(89, 11, 11, 1) 100%); }
-  .container[data-group="g3"]{ --panel-bg: linear-gradient(0deg,rgba(105,30,61,1) 0%, rgba(75,14,61,1) 83%, rgba(56,4,61,1) 100%); }
+  /* ===== 新增：用 data-scheme 控制黑/紫兩種底色（取代原本紅色） ===== */
+  .container[data-scheme="black"]{
+    --panel-bg: linear-gradient(0deg,rgba(43,37,37,1) 0%, rgba(0,0,0,1) 100%);
+  }
+  .container[data-scheme="purple"]{
+    --panel-bg: linear-gradient(0deg,rgba(105,30,61,1) 0%, rgba(75,14,61,1) 83%, rgba(56,4,61,1) 100%);
+  }
 
   /* 頁首（中間置中標題；右上角顯示步驟） */
   .header {
@@ -139,10 +115,12 @@
     backdrop-filter: blur(2px);
   }
   .header-title {
-    font-weight: 800;
+    font-weight: 900;                 /* 要粗體 */
     font-size: var(--title-size);
     text-align: center;
     letter-spacing: 0.5px;
+    /* 加陰影（柔） */
+    text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 0 8px rgba(0,0,0,.35);
   }
   .header-step {
     position: absolute;
@@ -166,7 +144,7 @@
   .step h2 {
     margin: 0 0 10px 0;
     font-size: var(--title-size);
-    text-align: center;
+    text-align: center; /* 標題置中（最後一頁也會套用） */
     font-weight: 800;
   }
 
@@ -184,185 +162,100 @@
   }
 
   /* 第1頁特別：整組置中 + 選項置中 */
-  .center-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-  }
-  .radio-row {
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-    flex-wrap: wrap;
-  }
+  .center-block { display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; }
+  .radio-row { display:flex; justify-content:center; gap:18px; flex-wrap:wrap; }
   .exit {
-    background: rgba(250, 204, 21, .10);   /* 改成淡黃底 */
-    border: 1px solid rgba(250, 204, 21, .45); /* 黃邊 */
-    color: #fde68a;                       /* 淡黃色字 */
-    padding: 12px;
-    border-radius: 12px;
-    margin-top: 8px;
-    display: none;
+    background: rgba(250, 204, 21, .10);
+    border: 1px solid rgba(250, 204, 21, .45);
+    color: #fde68a;
+    padding: 12px; border-radius: 12px; margin-top: 8px; display: none;
   }
-  .exit.show { display: block; }
+  .exit.show { display:block;}
 
-  /* 表單控制項（統一寬高） */
-  label { 
-    font-weight: 700; 
-    display: block; 
-    margin-bottom: 6px;
-    /* 欄位標題字級（例如 公司名稱） */
-    font-size: var(--label-size, var(--content-size));
-  }
-  label small { 
-    color: var(--muted); 
-    font-weight: 600; 
-    margin-left: 4px;
-    /* 小字提示字級（例如 ⏍ 提示） */
-    font-size: var(--hint-size, var(--content-size)); 
-  }
+  /* 表單控制項（統一寬高 + 與 ⏍ 同色） */
+  label { font-weight: 700; display:block; margin-bottom:6px; font-size: var(--label-size, var(--content-size)); }
+  label small { color: var(--muted); font-weight: 600; margin-left:4px; font-size: var(--hint-size, var(--content-size)); }
   .row { margin-bottom: var(--section-gap); }
 
-  input[type="text"],
-  input[type="email"],
-  select {
+  input[type="text"], input[type="email"], select {
     width: 100%;
     padding: var(--control-pad);
     background: var(--control-bg);
     border: 1px solid var(--control-border);
     border-radius: var(--control-radius);
     outline: none;
-
-    /* 調整：輸入框/選單 內文字與 ⏍ 同色 + 同字級（12px） */
-    color: var(--muted) !important;
+    color: var(--muted) !important;  /* 與 ⏍ 同色 */
     font-size: var(--input-size);
-
     height: var(--input-height);
     box-sizing: border-box;
   }
+  input::placeholder { font-size: var(--placeholder-size); color: var(--muted); }
+  input:focus, select:focus { border-color: var(--control-focus); box-shadow: 0 0 0 3px rgba(96,165,250,.25); }
 
-  /* placeholder 字級與顏色鎖定為 ⏍ 同色 */
-  input::placeholder { 
-    font-size: var(--placeholder-size);
-    color: var(--muted);
-  }
-
-  input:focus, select:focus {
-    border-color: var(--control-focus);
-    box-shadow: 0 0 0 3px rgba(96,165,250,.25);
-  }
-
-  /* 錯誤訊息字級與顏色（淡黃） */
   .error { color: var(--danger); margin-top: 6px; font-size: var(--error-size); display:none; }
-
-  /* 讓「只有是/否」的頁面維持與內容相同大小（不受 label 13px 影響） */
   .radio-row label { font-size: var(--content-size); font-weight: 700; }
 
-  /* iOS Safari 自動放大防呆（僅作用在登入遮罩的密碼欄；避免一開始整頁放大） */
+  /* iOS Safari：避免聚焦自動放大
+     策略：iOS 上「聚焦時字級 16px」，離焦回 12px；並且 meta 鎖最大縮放=1。 */
   @supports (-webkit-touch-callout: none) {
-    .gate #gatePwd { font-size: 16px; }
+    input[type="text"]:focus, input[type="email"]:focus, select:focus { font-size: 16px !important; }
   }
 
-  /* 強制 select 仍用 12px 與 ⏍ 同色（覆蓋可能的環境差異） */
+  /* 強制 select 仍用與 ⏍ 同色（覆蓋可能的環境差異） */
   select { font-size: var(--input-size) !important; color: var(--muted) !important; }
 
-  /* 檔案上傳（同高） */
+  /* 檔案上傳（同一排顯示縮圖） */
   .file-row {
     display: grid;
-    grid-template-columns: 1fr auto 1.2fr; /* 左：文字；中：按鈕；右：檔名 + 縮圖（同一排） */
-    gap: 10px;
-    align-items: center;
-    margin-bottom: var(--section-gap);
+    grid-template-columns: 1fr auto 1.2fr; /* 左：文字；中：按鈕；右：檔名 + 縮圖 */
+    gap: 10px; align-items: center; margin-bottom: var(--section-gap);
   }
   .file-name {
-    color: var(--muted);
-    font-size: var(--content-size);
+    color: var(--muted); font-size: var(--content-size);
     min-height: var(--input-height);
-    display: flex; align-items: center; gap: 8px; /* 調整：讓縮圖與檔名排同一列 */
-    padding: 0 6px;
-    border: 1px dashed var(--control-border);
-    border-radius: var(--control-radius);
-    background: rgba(255,255,255,0.02);
-    box-sizing: border-box;
-    overflow: hidden;
+    display:flex; align-items:center; gap:8px;
+    padding: 0 6px; border:1px dashed var(--control-border);
+    border-radius: var(--control-radius); background: rgba(255,255,255,0.02); box-sizing:border-box; overflow:hidden;
   }
-  .thumb {
-    width: 48px; height: 32px;            /* 縮圖尺寸（可調） */
-    object-fit: cover; border-radius: 6px; 
-    display: none;                         /* 預設隱藏，選到圖片才顯示 */
-  }
+  .thumb { width:48px; height:32px; object-fit:cover; border-radius:6px; display:none; }
+
   .file-input { position: relative; overflow: hidden; display: inline-block; }
   .file-input input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .file-btn {
-    appearance: none;
-    border: 1px solid var(--btn-border);
-    background: var(--btn-bg);
-    color: var(--ink);
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    font-size: var(--content-size);
-    min-height: var(--input-height);
+    appearance: none; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--ink);
+    padding: 10px 14px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: var(--content-size); min-height: var(--input-height);
     display: inline-flex; align-items: center;
   }
 
-  /* 只縮小「上一頁 / 下一頁」兩顆按鈕 */
-  .btn--nav {
-    min-height: var(--nav-btn-min-h);
-    padding: var(--nav-btn-pad);
-  }
+  /* 只縮小「上一頁 / 下一頁 / 完成」三顆按鈕（保留原註解，不影響功能） */
+  .btn--nav { min-height: var(--nav-btn-min-h); padding: var(--nav-btn-pad); }
 
   /* 底部固定操作列（全頁共用） */
   .actionbar {
-    position: relative;
-    display: flex;
-    gap: 10px;
-    justify-content: space-between;
-    align-items: center;
+    position: relative; display:flex; gap:10px; justify-content:space-between; align-items:center;
     padding: var(--actionbar-pad-y) var(--actionbar-pad-x) calc(var(--actionbar-pad-y) + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border);
-    background: rgba(0,0,0,0.35);
-    backdrop-filter: blur(4px);
-    height: auto; /* 自適應高度，JS 會同步 padding-bottom */
-    transform: translateY(calc(-1 * var(--kv-offset))); /* 鍵盤抬升位移 */
+    border-top: 1px solid var(--border); background: rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+    height:auto; transform: translateY(calc(-1 * var(--kv-offset)));
     transition: opacity .18s ease;
   }
-  .btn {
-    appearance: none;
-    border: 1px solid var(--btn-border);
-    background: var(--btn-bg);
-    color: var(--ink);
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    font-size: var(--content-size);
-    min-height: var(--input-height);
-  }
-  .btn:disabled { opacity: .55; cursor: not-allowed; }
+  .btn { appearance:none; border:1px solid var(--btn-border); background:var(--btn-bg); color:var(--ink);
+    padding:10px 14px; border-radius:12px; font-weight:800; cursor:pointer; font-size:var(--content-size); min-height:var(--input-height); }
+  .btn:disabled { opacity:.55; cursor:not-allowed; }
 
   /* Sticky Footer（每頁都會看到） */
   .footer {
-    border-top: 1px solid var(--border);
-    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
-    text-align: center;
-    color: var(--muted);
-    font-size: var(--footer-size);
-    background: rgba(0,0,0,0.15);
-    height: var(--footer-h);
-    transform: translateY(calc(-1 * var(--kv-offset))); /* 鍵盤抬升位移 */
+    border-top:1px solid var(--border);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    text-align:center; color: var(--muted); font-size: var(--footer-size);
+    background:rgba(0,0,0,0.15); height:var(--footer-h);
+    transform: translateY(calc(-1 * var(--kv-offset)));
   }
 
-  /* 鍵盤開啟時：隱藏底部操作列，避免擋住視線（其餘程式不動） */
-  body.kb-open .actionbar { opacity: 0; pointer-events: none; transform: translateY(0) !important; }
+  /* 鍵盤開啟時：隱藏底部操作列，避免擋住視線 */
+  body.kb-open .actionbar { opacity:0; pointer-events:none; transform:translateY(0)!important; }
   body.kb-open .content { padding-bottom: calc(var(--footer-h) + 16px); }
 
-  /* ========== 每頁獨立設定區（可逐頁覆蓋） ========== */
-
-  /* 配色／字級設定區 */
+  /* ========== 每頁獨立設定區（可逐頁覆蓋；字級） ========== */
   .step[data-page="1"]{ --title-size: 15px; --content-size: 12px; }
   .step[data-page="2"]{ --title-size: 15px; --content-size: 12px; }
   .step[data-page="3"]{ --title-size: 15px; --content-size: 12px; }
@@ -377,59 +270,22 @@
   .step[data-page="12"]{ --title-size: 15px; --content-size: 12px; }
   .step[data-page="13"]{ --title-size: 15px; --content-size: 12px; }
 
-  /* 第10頁：範例圖片樣式（調整為上下排列） */
-  .samples { 
-    display: grid;
-    grid-template-columns: 1fr; /* 調整：上下排列（單欄） */
-    gap: var(--sample-gap);
-    align-items: start;
-    margin-top: 10px;
-  }
-  .sample-box{
-    background: var(--sample-bg);
-    border: 1px dashed var(--control-border);
-    border-radius: var(--sample-radius);
-    padding: var(--sample-pad);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .sample-img{
-    width: 100%;
-    height: var(--sample-max-h);   /* 超出則以高度限制，自動縮小 */
-    object-fit: contain;           /* 盡量塞進盒子不裁切 */
-    image-rendering: auto;
-  }
-  .sample-cap{
-    margin-top: 6px;
-    font-size: var(--content-size);
-    color: var(--muted);
-    text-align: center;
-  }
+  /* 第10頁：範例圖片改上下 */
+  .samples{ display:grid; grid-template-columns:1fr; gap:var(--sample-gap); align-items:start; margin-top:10px; }
+  .sample-box{ background:var(--sample-bg); border:1px dashed var(--control-border); border-radius:var(--sample-radius); padding:var(--sample-pad); display:flex; flex-direction:column; align-items:center; }
+  .sample-img{ width:100%; height:var(--sample-max-h); object-fit:contain; image-rendering:auto; }
+  .sample-cap{ margin-top:6px; font-size:var(--content-size); color:var(--muted); text-align:center; }
 
   /* ====== 登入遮罩樣式（沿用樣式當密碼鎖） ====== */
-  .gate {
-    position: fixed; inset: 0; z-index: 9999;
-    background: rgba(0,0,0,0.75);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .gate-card {
-    width: min(520px, 92vw);
-    background: rgba(30,30,30,0.95);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.45);
-  }
-  .gate h3 { margin: 0 0 10px 0; font-size: 16px; text-align: center; }
-  .gate p { margin: 6px 0; color: var(--muted); font-size: 13px; text-align: center; }
-  .gate .row { margin-top: 12px; text-align: center; } /* 整排置中 */
-  .gate .row label { text-align: center; }            /* 標籤置中 */
-  .gate .row input {
-    display: block; margin: 0 auto; text-align: center; max-width: 320px; /* 輸入框置中與寬度 */
-  }
-  .gate .error { text-align: center; display:none; }
-  .gate-actions { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+  .gate{ position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; }
+  .gate-card{ width:min(520px, 92vw); background:rgba(30,30,30,0.95); border:1px solid var(--border); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.45); }
+  .gate h3{ margin:0 0 10px 0; font-size:16px; text-align:center; }
+  .gate p{ margin:6px 0; color:var(--muted); font-size:13px; text-align:center; }
+  .gate .row{ margin-top:12px; text-align:center; }
+  .gate .row label{ text-align:center; }
+  .gate .row input{ display:block; margin:0 auto; text-align:center; max-width:320px; }
+  .gate .error{ text-align:center; display:none; }
+  .gate-actions{ display:flex; gap:10px; justify-content:center; margin-top:12px; }
   </style>
 </head>
 <body>
@@ -449,9 +305,10 @@
     </div>
   </div>
 
-  <div class="container" role="region" aria-label="勞工名卡 分步表單" data-group="g1">
+  <div class="container" role="region" aria-label="勞報建檔表 分步表單" data-scheme="black">
     <header class="header">
-      <div class="header-title">📝 勞工名卡建檔表</div>
+      <!-- 標題：依你要求「勞報建檔表」、粗體＋陰影 -->
+      <div class="header-title">📝 勞報建檔表</div>
       <div class="header-step" id="headerStep">第01頁/共13頁</div>
     </header>
 
@@ -593,12 +450,12 @@
         </div>
       </section>
 
-      <!-- 第6頁：聯絡與學歷 -->
+      <!-- 第6頁：聯絡與學歷（Gmail 只在提交時才檢查） -->
       <section class="step" data-page="6" id="step-6">
         <div class="row">
           <label for="gmail">© Gmail <small>⏍ 限定Gmail並全程小寫</small></label>
           <input id="gmail" type="email" placeholder="請輸入mail" />
-          <div class="error" id="errGmail">⚠️ 請輸入有效Gmail並使用小寫</div>
+          <div class="error" id="errGmail">⚠️ 請輸入有效 Gmail（@gmail.com）</div>
         </div>
 
         <div class="row">
@@ -665,7 +522,7 @@
         </div>
       </section>
 
-      <!-- 第9頁：眷屬加保（條件欄位；生日同 7 碼規則） -->
+      <!-- 第9頁：眷屬加保 -->
       <section class="step" data-page="9" id="step-9">
         <div class="row">
           <label for="depEnable">© 眷屬是否依附加保</label>
@@ -713,7 +570,7 @@
           <li>檔案須符合本公司限定規格.</li>
         </ol>
 
-        <!-- //* --------第10頁：範例圖片區（已改上下排列）--------*// -->
+        <!-- 範例改上下 -->
         <div class="samples" aria-label="身分證範本">
           <figure class="sample-box">
             <img class="sample-img" src="assets/身分證範本-正面.jpg" alt="❗️範例-身分證上傳限定規格-正面">
@@ -724,7 +581,6 @@
             <figcaption class="sample-cap">範例-身分證上傳限定規格-背面</figcaption>
           </figure>
         </div>
-        <!-- //* --------第10頁：範例圖片區--------*// -->
 
         <div class="fieldset" style="margin-top:16px;">
           <div style="font-weight:800; margin-bottom:8px; text-align:center;">是否同意上述事項</div>
@@ -736,7 +592,7 @@
         </div>
       </section>
 
-      <!-- 第11頁：上傳身分證正面/反面（縮圖顯示在按鈕旁） -->
+      <!-- 第11頁：上傳身分證正面/反面（縮圖在按鈕旁） -->
       <section class="step" data-page="11" id="step-11">
         <div class="file-row">
           <div>身分證正面</div>
@@ -744,10 +600,8 @@
             <span class="file-btn">選擇檔案</span>
             <input id="idFront" type="file" accept=".pdf,image/*" />
           </label>
-          <!-- 檔名 + 縮圖在同一列 -->
           <div class="file-name" id="nameFront">
-            <img class="thumb" id="thumbFront" alt="縮圖預覽">
-            <span id="nameFrontTxt">尚未選取檔案</span>
+            <img class="thumb" id="thumbFront" alt="縮圖預覽"><span id="nameFrontTxt">尚未選取檔案</span>
           </div>
         </div>
         <div class="error" id="errFront">⚠️ 請選擇身分證正面檔案</div>
@@ -758,10 +612,8 @@
             <span class="file-btn">選擇檔案</span>
             <input id="idBack" type="file" accept=".pdf,image/*" />
           </label>
-          <!-- 檔名 + 縮圖在同一列 -->
           <div class="file-name" id="nameBack">
-            <img class="thumb" id="thumbBack" alt="縮圖預覽">
-            <span id="nameBackTxt">尚未選取檔案</span>
+            <img class="thumb" id="thumbBack" alt="縮圖預覽"><span id="nameBackTxt">尚未選取檔案</span>
           </div>
         </div>
         <div class="error" id="errBack">⚠️ 請選擇身分證反面檔案</div>
@@ -779,42 +631,31 @@
         </div>
       </section>
 
-      <!-- 第12頁：❗️資料送出前-核檢區（保留原版） -->
+      <!-- 第12頁：❗️資料送出前-核檢區（7 條勾選；不顯示錯誤） -->
       <section class="step" data-page="12" id="step-12">
         <h2>❗️資料送出前-核檢區</h2>
-        <ol class="note-list">
-          <li>請仔細思考認真填寫此表單.</li>
-          <li>以上輸入資料都進行雙重確認.</li>
-          <li>本人聲明無偽造之不法情形.</li>
-          <li>上傳檔案都符合本公司格式.</li>
-          <li>本表單有提供檢核表，請確實檢查後再勾選.</li>
-          <li>5-1. 若勾選後還填寫錯誤，請自負責任.</li>
-          <li>提交表單後，請完成截圖回報機制.</li>
-        </ol>
         <div class="fieldset">
           <div class="checks">
-            <label><input type="checkbox" id="pre1"> 我已再次確認所有資料正確</label>
-            <label><input type="checkbox" id="pre2"> 我已再次確認日期、格式無誤</label>
-            <label><input type="checkbox" id="pre3"> 我已再次確認無偽造或不法</label>
-            <label><input type="checkbox" id="pre4"> 我上傳之檔案均符合規格</label>
-            <label><input type="checkbox" id="pre5"> 我已閱讀檢核表並確實檢查</label>
-            <label><input type="checkbox" id="pre6"> 我了解：勾選後資料錯誤需自負責任</label>
-            <label><input type="checkbox" id="pre7"> 我已知需截圖回報完成</label>
+            <label><input type="checkbox" id="preA"> 請仔細思考認真填寫此表單.</label>
+            <label><input type="checkbox" id="preB"> 以上輸入資料都進行雙重確認.</label>
+            <label><input type="checkbox" id="preC"> 本人聲明無偽造之不法情形.</label>
+            <label><input type="checkbox" id="preD"> 上傳檔案都符合本公司格式.</label>
+            <label><input type="checkbox" id="preE"> 本表單有提供檢核表，請確實檢查後再勾選.</label>
+            <label><input type="checkbox" id="preF"> 5-1. 若勾選後還填寫錯誤，請自負責任.</label>
+            <label><input type="checkbox" id="preG"> 提交表單後，請完成截圖回報機制.</label>
           </div>
-          <div class="error" id="errPreflight">⚠️ 需全部勾選才能進入下一頁</div>
         </div>
       </section>
 
-      <!-- 第13頁：完成 -->
+      <!-- 第13頁：完成（標題置中；到此自動鎖定、無上一頁/完成） -->
       <section class="step" data-page="13" id="step-13">
-        <h2✅ >全數完成</h2>
+        <h2>✅ 全數完成</h2>
         <div style="text-align:center; line-height:1.8;">
-          © 勞工名卡登記表
+          © 勞報建檔表
           <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;">
           <div>❗️請截圖此畫面給承辦人</div>
           <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;">
           <div>系統已收到資料,將進入處理排程,表單已填寫完畢.</div>
-          <!-- 新增：時間戳顯示（Created / Updated） -->
           <div style="margin-top:10px;color:var(--muted);font-size:11px;">
             建立時間：<span id="stampCreated">—</span>　最後更新：<span id="stampUpdated">—</span>
           </div>
@@ -825,13 +666,11 @@
     <!-- 底部固定操作列（全頁共用） -->
     <div class="actionbar" id="actionbar">
       <div class="left-actions">
-        <!-- 左側只放「上一頁」 -->
         <button class="btn btn--nav" id="btnPrev" type="button">上一頁</button>
       </div>
       <div class="right-actions" style="display:flex; gap:10px;">
-        <!-- 右側放「下一頁」與「完成」 -->
         <button class="btn btn--nav" id="btnNext" type="button">下一頁</button>
-        <button class="btn" id="btnFinish" type="button">完成</button>
+        <!-- 已依需求移除「完成」按鈕 -->
       </div>
     </div>
 
@@ -857,19 +696,15 @@ function fmtTW(d){
     return new Intl.DateTimeFormat('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'Asia/Taipei'}).format(d);
   }catch(e){ return d.toLocaleString(); }
 }
-function setCreatedNow(){
-  if(!FORM_META.createdAt){ FORM_META.createdAt = new Date(); updateStampUI(); }
-}
-function setUpdatedNow(){
-  FORM_META.updatedAt = new Date(); updateStampUI();
-}
+function setCreatedNow(){ if(!FORM_META.createdAt){ FORM_META.createdAt = new Date(); updateStampUI(); } }
+function setUpdatedNow(){ FORM_META.updatedAt = new Date(); updateStampUI(); }
 function updateStampUI(){
   const c = $("#stampCreated"), u = $("#stampUpdated");
   if(c){ c.textContent = FORM_META.createdAt ? fmtTW(FORM_META.createdAt) : "—"; }
   if(u){ u.textContent = FORM_META.updatedAt ? fmtTW(FORM_META.updatedAt) : "—"; }
 }
 
-/* ====== 密碼進入遮罩（移除信箱登入，改為密碼驗證；置中已於 CSS 處理） ====== */
+/* ====== 密碼進入遮罩 ====== */
 (function passGateInit(){
   const gate = $("#passGate"), pwd = $("#gatePwd"), btn = $("#gatePwdStart"), err=$("#gatePwdErr");
   if(!gate) return;
@@ -879,65 +714,26 @@ function updateStampUI(){
     if(v !== ACCESS_PWD){ err.style.display="block"; return; }
     err.style.display="none";
     gate.style.display="none";
-    setCreatedNow(); /* 成功進入即紀錄建立時間 */
-    autoFitActionbarHeight(); /* 進入後立刻量測操作列高度 */
+    setCreatedNow();
+    autoFitActionbarHeight();
   });
 })();
 
-/* ====== 針對 iOS：鍵盤彈出時鎖縮放 + 隱藏底部操作列（避免擋視線） ====== */
+/* ====== 鍵盤與縮放控制（iOS） ====== */
 (function keyboardLift(){
   const vv = window.visualViewport;
-  const vp = document.getElementById('viewportMeta');
   if(!vv) return;
-
-  function lockZoom(lock){
-    if(!vp) return;
-    const base = 'width=device-width,initial-scale=1,viewport-fit=cover';
-    vp.setAttribute('content', lock ? base + ',maximum-scale=1' : base + ',maximum-scale=5');
-  }
-
   function apply(){
     const bottomInset = (window.innerHeight - vv.height - vv.offsetTop);
     document.documentElement.style.setProperty('--kv-offset', bottomInset>0 ? `${bottomInset}px` : '0px');
-    /* 鍵盤明顯佔位時，加上 kb-open；否則移除 */
-    if(bottomInset > 80){ document.body.classList.add('kb-open'); lockZoom(true); }
-    else { document.body.classList.remove('kb-open'); lockZoom(false); }
-    autoFitActionbarHeight(); /* 鍵盤變動時一併重量測 actionbar 高度 */
+    if(bottomInset > 80){ document.body.classList.add('kb-open'); }
+    else { document.body.classList.remove('kb-open'); }
+    autoFitActionbarHeight();
   }
   vv.addEventListener('resize', apply);
   vv.addEventListener('scroll', apply);
   window.addEventListener('resize', apply);
   apply();
-
-  /* 額外保險：聚焦/離焦任何輸入欄位時也觸發鎖縮放 */
-  document.addEventListener('focusin', (e)=>{
-    if(e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.target instanceof HTMLTextAreaElement){
-      document.body.classList.add('kb-open'); lockZoom(true);
-    }
-  });
-  document.addEventListener('focusout', (e)=>{
-    setTimeout(()=>{ /* 等待活躍元素切換完成 */
-      const a = document.activeElement;
-      const focusing = a && (a.tagName==='INPUT' || a.tagName==='SELECT' || a.tagName==='TEXTAREA');
-      if(!focusing){ document.body.classList.remove('kb-open'); lockZoom(false); }
-    }, 50);
-  });
-})();
-
-/* 自動量測 actionbar 高度 → 寫回 --actionbar-h，讓內容可視區更大 */
-function autoFitActionbarHeight(){
-  const bar = $("#actionbar");
-  if(!bar) return;
-  const h = bar.offsetHeight;
-  document.documentElement.style.setProperty('--actionbar-h', `${h}px`);
-}
-
-/* 監聽操作列尺寸變化（文字換行/按鈕狀態變化時同步） */
-(function observeBar(){
-  const bar = $("#actionbar");
-  if(!bar || !('ResizeObserver' in window)) return;
-  const ro = new ResizeObserver(()=> autoFitActionbarHeight());
-  ro.observe(bar);
 })();
 
 /* 焦點自動可視（避免被鍵盤或操作列擋住） */
@@ -958,14 +754,12 @@ function isValidYMD(str){
 }
 function isTenAlnum(s){ return /^[A-Za-z0-9]{10}$/.test(s); }
 function isValidMobile(s){ return /^09\d{2}-\d{3}-\d{3}$/.test(s); }
-/* 工資：允許純數字或正確半形千分位（整數） */
 function isValidWageStrict(s){
   if(!s) return false;
   if(/^\d+$/.test(s)) return parseInt(s,10)>0;
   if(/^\d{1,3}(,\d{3})+$/.test(s)) return true;
   return false;
 }
-/* 民國生日 7 碼：yyyMMdd -> 轉西元檢核 */
 function isValidRoc7(str){
   if(!/^\d{7}$/.test(str)) return false;
   const y = parseInt(str.slice(0,3),10) + 1911;
@@ -975,45 +769,35 @@ function isValidRoc7(str){
   return dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
 }
 
-/* 動態前綴驗證（只有「不可能成立」或 onblur 才顯示錯誤） */
+/* 前綴即時檢查 */
 function mobilePrefixOK(v){
-  // 目標格式：09dd-ddd-ddd
   const len = v.length;
   for(let i=0;i<len;i++){
     const ch = v[i];
     if(i===0){ if(ch!=='0') return false; continue; }
     if(i===1){ if(ch!=='9') return false; continue; }
     if(i===4 || i===8){ if(ch!=='-') return false; continue; }
-    if(i!==4 && i!==8){
-      if(ch<'0' || ch>'9') return false;
-    }
+    if(i!==4 && i!==8){ if(ch<'0' || ch>'9') return false; }
   }
   return true;
 }
 function ymdPrefixOK(v){
-  // 目標：YYYY-MM-DD；在 index 4 與 7 必須是 '-'
   for(let i=0;i<v.length;i++){
     const ch = v[i];
     if(i===4 || i===7){ if(ch!=='-') return false; }
-    else {
-      if(ch<'0' || ch>'9') return false;
-    }
+    else { if(ch<'0' || ch>'9') return false; }
   }
   return true;
 }
 function wagePrefixOK(v){
-  // 允許：^\d{1,3}(,\d{0,3})*$；但除了最後一組之外，逗號後面必須滿 3 位
   if(v==="" ) return true;
   if(!/^[\d,]+$/.test(v)) return false;
   const parts = v.split(",");
   if(parts[0].length<1 || parts[0].length>3 || !/^\d+$/.test(parts[0])) return false;
   for(let i=1;i<parts.length;i++){
     const seg = parts[i];
-    if(i < parts.length-1){
-      if(!/^\d{3}$/.test(seg)) return false; // 中間段必須剛好 3 位
-    }else{
-      if(!/^\d{0,3}$/.test(seg)) return false; // 最末段 0~3 位皆可（輸入中）
-    }
+    if(i < parts.length-1){ if(!/^\d{3}$/.test(seg)) return false; }
+    else{ if(!/^\d{0,3}$/.test(seg)) return false; }
   }
   return true;
 }
@@ -1025,15 +809,35 @@ const TOUCHED = Object.create(null);
 function markTouched(id){ if(id) TOUCHED[id] = true; }
 function shouldShowErr(id, submit){ return !!submit || !!TOUCHED[id]; }
 
-/* ====== 步驟顯示與面板背景分組 ====== */
+/* ====== 步驟顯示與背景配色 ====== */
 let currentPage = 1;
+let IS_LOCKED = false; /* 完成或最後頁進入後鎖定 */
 function pad2(n){ return String(n).padStart(2,'0'); }
+
+/* 指定頁為紫色：1,3,7,10,12；其餘黑色 */
+function pageIsPurple(n){ return [1,3,7,10,12].includes(n); }
+
 function updateHeaderStep(){
   $("#headerStep").textContent = `第${pad2(currentPage)}頁/共${TOTAL_STEPS}頁`;
-  const group = currentPage<=6 ? "g1" : (currentPage<=9 ? "g2" : "g3");
-  $(".container").setAttribute("data-group", group);
+  const scheme = pageIsPurple(currentPage) ? "purple" : "black";
+  $(".container").setAttribute("data-scheme", scheme);
 }
+
+function lockAllAndHideNav(){
+  IS_LOCKED = true;
+  // 停用所有可互動元素
+  document.querySelectorAll('input, select, button, textarea').forEach(el=>{
+    el.disabled = true;
+  });
+  // 導航按鈕隱藏（最後一頁不要上一頁/完成）
+  const prev=$("#btnPrev"), next=$("#btnNext"), fin=$("#btnFinish");
+  if(prev){ prev.style.display="none"; }
+  if(next){ next.style.display="none"; }
+  if(fin){ fin.style.display="none"; }
+}
+
 function showStep(pageNumber){
+  if(IS_LOCKED && pageNumber!==TOTAL_STEPS) return; /* 鎖定後不可離開完成頁 */
   $$(".step").forEach(s=>s.classList.remove("active"));
   const el = document.getElementById(`step-${pageNumber}`);
   if(el) el.classList.add("active");
@@ -1041,9 +845,21 @@ function showStep(pageNumber){
   updateHeaderStep();
   $("#content").scrollTo({ top: 0, behavior: "instant" });
   updateNavState();
+
+  /* 新增：到最後一頁即自動鎖定、隱藏上一頁與完成 */
+  if(pageNumber===TOTAL_STEPS){
+    setUpdatedNow();
+    // 等一個 event loop 讓畫面切到最後頁，再鎖定
+    setTimeout(()=>{ lockAllAndHideNav(); updateNavState(); }, 0);
+  }
 }
 
 /* ====== 各頁驗證（submit=false：不顯示紅字；true：顯示紅字） ====== */
+function isValidGmailOnSubmit(val, submit){
+  val = (val||"").toLowerCase().trim();
+  return submit ? /^[a-z0-9._%+-]+@gmail\.com$/.test(val) : true;
+}
+
 function validatePage(n, submit=false){
   switch(n){
     case 1: {
@@ -1054,8 +870,7 @@ function validatePage(n, submit=false){
     }
     case 2: {
       let ok = true;
-      const corp = $("#corp").value.trim();
-      const corpInvalid = corp==="";
+      const corpInvalid = $("#corp").value.trim()==="";
       $("#errCorp").style.display = (corpInvalid && shouldShowErr("corp", submit)) ? "block" : "none";
       if(corpInvalid) ok=false;
 
@@ -1123,11 +938,9 @@ function validatePage(n, submit=false){
     }
     case 6: {
       let ok = true;
-      const el = $("#gmail");
-      let val = el.value.trim().toLowerCase();
-      const gInvalid = !/^[a-z0-9._%+-]+@gmail\.com$/.test(val);
-      $("#errGmail").style.display = (gInvalid && shouldShowErr("gmail", submit)) ? "block" : "none";
-      if(gInvalid) ok=false;
+      const gOK = isValidGmailOnSubmit($("#gmail").value, submit);
+      $("#errGmail").style.display = (submit && !gOK) ? "block" : "none";
+      if(!gOK) ok=false;
 
       const mInvalid = !isValidMobile($("#mobile").value.trim());
       $("#errMobile").style.display = (mInvalid && shouldShowErr("mobile", submit)) ? "block" : "none";
@@ -1214,8 +1027,8 @@ function validatePage(n, submit=false){
       return ok;
     }
     case 12: {
-      const all = ["#pre1","#pre2","#pre3","#pre4","#pre5","#pre6","#pre7"].every(sel=> $(sel).checked);
-      $("#errPreflight").style.display = (!all && shouldShowErr("preflight", submit)) ? "block" : "none";
+      /* 你的規則：全部勾選才通過，不顯示錯誤訊息 */
+      const all = ["#preA","#preB","#preC","#preD","#preE","#preF","#preG"].every(sel=> $(sel).checked);
       return all;
     }
     case 13: return true;
@@ -1226,11 +1039,19 @@ function validatePage(n, submit=false){
 /* ====== 底部操作列：狀態控制 ====== */
 function updateNavState(){
   const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnFinish=$("#btnFinish");
-  btnPrev.disabled = currentPage<=1;
-  btnFinish.style.display = currentPage===TOTAL_STEPS ? "inline-block" : "none";
-  btnNext.style.display   = currentPage===TOTAL_STEPS ? "none" : "inline-block";
-  btnNext.disabled = !validatePage(currentPage, /*submit*/ false); /* 只算通過與否，不顯示紅字 */
-  btnFinish.disabled = currentPage!==TOTAL_STEPS; /* 最後一頁才可按 */
+  const onLast = currentPage===TOTAL_STEPS;
+
+  btnPrev.disabled = IS_LOCKED || currentPage<=1;
+  btnNext.style.display   = onLast ? "none" : "inline-block";
+  btnNext.disabled   = IS_LOCKED || !validatePage(currentPage, /*submit*/ false);
+
+  /* 安全判斷：若沒有完成按鈕，以下不執行 */
+  if(btnFinish){
+    btnFinish.style.display = onLast ? "none" : "inline-block"; /* 最後一頁不要完成 */
+    btnFinish.disabled = IS_LOCKED || onLast || currentPage!==TOTAL_STEPS; /* 最後一頁直接隱藏，不使用 */
+  }
+
+  if(onLast){ btnPrev.style.display="none"; } else { btnPrev.style.display="inline-block"; }
 }
 
 /* 清除當頁（函式保留但按鈕已移除） */
@@ -1255,43 +1076,27 @@ function clearCurrentPage(){
 /* ====== 事件綁定與初始化 ====== */
 function bindLiveValidation(){
   /* 第1頁 */
-  $$('input[name="agree1"]').forEach(r=> r.addEventListener('change', ()=>{
-    markTouched('agree1'); updateNavState();
-  }));
+  $$('input[name="agree1"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agree1'); updateNavState(); }));
+
   /* 第2頁 */
   ["#corp","#team","#workType","#startDate","#wage"].forEach(sel=>{
     const el=$(sel); if(!el) return;
     ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
-  /* 動態前綴：到職日期 / 約定工資 */
-  $("#startDate")?.addEventListener('input', (e)=>{
-    const v = e.target.value.trim();
-    const bad = v!=="" && !ymdPrefixOK(v);
-    $("#errStartDate").style.display = bad ? "block":"none";
-  });
-  $("#wage")?.addEventListener('input', (e)=>{
-    const v = e.target.value.trim();
-    const bad = v!=="" && !wagePrefixOK(v);
-    $("#errWage").style.display = bad ? "block":"none";
-  });
+  $("#startDate")?.addEventListener('input', (e)=>{ const v=e.target.value.trim(); $("#errStartDate").style.display=(v!=="" && !ymdPrefixOK(v))?"block":"none"; });
+  $("#wage")?.addEventListener('input', (e)=>{ const v=e.target.value.trim(); $("#errWage").style.display=(v!=="" && !wagePrefixOK(v))?"block":"none"; });
 
   /* 第3頁 */
-  $$('input[name="agreeInfo"]').forEach(r=> r.addEventListener('change', ()=>{
-    markTouched('agreeInfo'); updateNavState();
-  }));
+  $$('input[name="agreeInfo"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agreeInfo'); updateNavState(); }));
+
   /* 第4頁 */
   ["#fullName","#gender","#nid"].forEach(sel=>{
     const el=$(sel); if(!el) return;
     ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
-  /* 動態前綴：身分證字號 */
-  $("#nid")?.addEventListener('input', (e)=>{
-    const v = e.target.value;
-    const bad = v!=="" && !alnumPrefixOK(v,10);
-    $("#errNid").style.display = bad ? "block":"none";
-  });
+  $("#nid")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errNid").style.display=(v!=="" && !alnumPrefixOK(v,10))?"block":"none"; });
 
   /* 第5頁 */
   ["#birthRoc7","#birthPlace","#addrHouse","#addrLive"].forEach(sel=>{
@@ -1299,12 +1104,7 @@ function bindLiveValidation(){
     ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
-  /* 動態前綴：民國生日7碼 */
-  $("#birthRoc7")?.addEventListener('input', (e)=>{
-    const v = e.target.value;
-    const bad = v!=="" && !digitsPrefixOK(v,7);
-    $("#errBirthRoc7").style.display = bad ? "block":"none";
-  });
+  $("#birthRoc7")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errBirthRoc7").style.display=(v!=="" && !digitsPrefixOK(v,7))?"block":"none"; });
 
   /* 第6頁 */
   ["#gmail","#mobile","#edu"].forEach(sel=>{
@@ -1312,24 +1112,15 @@ function bindLiveValidation(){
     ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
-  /* Gmail 自動補 @gmail.com 與小寫化（不即時報錯） */
   $("#gmail")?.addEventListener('input', (e)=>{
-    const el = e.target;
-    let v = (el.value||"").toLowerCase();
-    if(v.endsWith("@")) v = v + "gmail.com";            /* 打到 @ 自動補 gmail.com */
+    const el=e.target; let v=(el.value||"").toLowerCase();
+    if(v.endsWith("@")) v = v + "gmail.com"; /* 方便你輸入 */
     el.value = v;
   });
-  /* 動態前綴：手機 */
-  $("#mobile")?.addEventListener('input', (e)=>{
-    const v = e.target.value;
-    const bad = v!=="" && !mobilePrefixOK(v);
-    $("#errMobile").style.display = bad ? "block" : "none";
-  });
+  $("#mobile")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errMobile").style.display=(v!=="" && !mobilePrefixOK(v))?"block":"none"; });
 
   /* 第7頁 */
-  $$('input[name="agreeOther"]').forEach(r=> r.addEventListener('change', ()=>{
-    markTouched('agreeOther'); updateNavState();
-  }));
+  $$('input[name="agreeOther"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agreeOther'); updateNavState(); }));
 
   /* 第8頁 */
   ["#emgName","#emgRel","#homePhone","#emgMobile","#emgAddr"].forEach(sel=>{
@@ -1337,11 +1128,7 @@ function bindLiveValidation(){
     ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
-  $("#emgMobile")?.addEventListener('input', (e)=>{
-    const v = e.target.value;
-    const bad = v!=="" && !mobilePrefixOK(v);
-    $("#errEmgMobile").style.display = bad ? "block" : "none";
-  });
+  $("#emgMobile")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errEmgMobile").style.display=(v!=="" && !mobilePrefixOK(v))?"block":"none"; });
 
   /* 第9頁 */
   ["#depEnable","#depRel","#depName","#depNid","#depBirth7"].forEach(sel=>{
@@ -1350,78 +1137,66 @@ function bindLiveValidation(){
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
   $("#depEnable")?.addEventListener('change', ()=>{ updateNavState(); });
-  $("#depNid")?.addEventListener('input', (e)=>{
-    const v = e.target.value;
-    const bad = v!=="" && !alnumPrefixOK(v,10);
-    $("#errDepNid").style.display = bad ? "block":"none";
-  });
-  $("#depBirth7")?.addEventListener('input', (e)=>{
-    const v = e.target.value;
-    const bad = v!=="" && !digitsPrefixOK(v,7);
-    $("#errDepBirth7").style.display = bad ? "block":"none";
-  });
+  $("#depNid")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errDepNid").style.display=(v!=="" && !alnumPrefixOK(v,10))?"block":"none"; });
+  $("#depBirth7")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errDepBirth7").style.display=(v!=="" && !digitsPrefixOK(v,7))?"block":"none"; });
 
-  /* 第10頁 */
-  $$('input[name="agreeUpload"]').forEach(r=> r.addEventListener('change', ()=>{
-    markTouched('agreeUpload'); updateNavState();
-  }));
+  /* 第10頁 同意 */
+  $$('input[name="agreeUpload"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agreeUpload'); updateNavState(); }));
 
-  /* 第11頁（檔名 + 縮圖） */
+  /* 第11頁 檔名 + 縮圖 */
   function bindPreview(inputSel, nameTxtSel, thumbSel){
-    const input = $(inputSel), nameTxt = $(nameTxtSel), thumb = $(thumbSel);
+    const input=$(inputSel), nameTxt=$(nameTxtSel), thumb=$(thumbSel);
     if(!input) return;
-    let lastURL = null;
+    let lastURL=null;
     input.addEventListener('change', ()=>{
       markTouched(input.id);
-      const f = input.files?.[0];
+      const f=input.files?.[0];
       nameTxt.textContent = f ? f.name : "尚未選取檔案";
       if(lastURL){ URL.revokeObjectURL(lastURL); lastURL=null; }
-      if(f && f.type.startsWith('image/')){
-        lastURL = URL.createObjectURL(f);
-        thumb.src = lastURL;
-        thumb.style.display = 'inline-block';
-      }else{
-        thumb.style.display = 'none';
-        thumb.src = "";
-      }
+      if(f && f.type.startsWith('image/')){ lastURL=URL.createObjectURL(f); thumb.src=lastURL; thumb.style.display='inline-block'; }
+      else{ thumb.style.display='none'; thumb.src=""; }
       updateNavState();
     });
   }
-  bindPreview("#idFront", "#nameFrontTxt", "#thumbFront");
-  bindPreview("#idBack", "#nameBackTxt", "#thumbBack");
+  bindPreview("#idFront","#nameFrontTxt","#thumbFront");
+  bindPreview("#idBack","#nameBackTxt","#thumbBack");
+  ["#chk1","#chk2","#chk3","#chk4"].forEach(sel=> $(sel)?.addEventListener('change', updateNavState));
 
-  ["#chk1","#chk2","#chk3","#chk4"].forEach(sel=>{
-    const el=$(sel); if(!el) return;
-    el.addEventListener('change', updateNavState);
-  });
-
-  /* 第12頁（核檢區） */
-  ["#pre1","#pre2","#pre3","#pre4","#pre5","#pre6","#pre7"].forEach(sel=>{
-    const el=$(sel); if(!el) return;
-    el.addEventListener('change', ()=>{
-      markTouched('preflight');
-      updateNavState();
-    });
+  /* 第12頁（你的 7 個勾選） */
+  ["#preA","#preB","#preC","#preD","#preE","#preF","#preG"].forEach(sel=>{
+    $(sel)?.addEventListener('change', ()=>{ markTouched('preflight'); updateNavState(); });
   });
 }
 
+function autoFitActionbarHeight(){
+  const bar = $("#actionbar"); if(!bar) return;
+  const h = bar.offsetHeight;
+  document.documentElement.style.setProperty('--actionbar-h', `${h}px`);
+}
+(function observeBar(){
+  const bar=$("#actionbar");
+  if(!bar || !('ResizeObserver' in window)) return;
+  const ro = new ResizeObserver(()=> autoFitActionbarHeight());
+  ro.observe(bar);
+})();
+
+/* ====== 導航/完成 ====== */
 function bindActionBar(){
-  $("#btnPrev").addEventListener("click", ()=>{
-    if(currentPage>1){ showStep(currentPage-1); }
-  });
+  $("#btnPrev").addEventListener("click", ()=>{ if(!IS_LOCKED && currentPage>1){ showStep(currentPage-1); } });
   $("#btnNext").addEventListener("click", ()=>{
+    if(IS_LOCKED) return;
     const ok = validatePage(currentPage, /*submit*/ true);
-    if(ok && currentPage<TOTAL_STEPS){
-      setUpdatedNow(); /* 每次過頁標記更新時間 */
-      showStep(currentPage+1);
-    }
+    if(ok && currentPage<TOTAL_STEPS){ setUpdatedNow(); showStep(currentPage+1); }
   });
-  $("#btnFinish").addEventListener("click", ()=>{
-    if(currentPage===TOTAL_STEPS){
-      setUpdatedNow(); /* 完成時也標記更新時間 */
-      alert("✅ 已完成,歡迎開始邁入地獄😈");
-    }
-  });
+  /* 安全判斷：若沒有完成按鈕，就不綁事件 */
+  const fin = $("#btnFinish");
+  if(fin){
+    fin.addEventListener("click", ()=>{
+      if(IS_LOCKED) return;
+      setUpdatedNow();
+      showStep(TOTAL_STEPS);
+    });
+  }
 }
 
 /* 初始顯示第1頁 */
@@ -1429,10 +1204,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
   showStep(1);
   bindLiveValidation();
   bindActionBar();
-  autoFitActionbarHeight(); /* 載入後先量測 actionbar 高度 */
-  updateStampUI();          /* 初始化時間戳顯示 */
-  /* 右上角頁碼初始化已由 showStep 處理 */
-  /* 注意：密碼正確後才會寫入 CreatedAt 時間戳 */
+  autoFitActionbarHeight();
+  updateStampUI();
 });
 </script>
 </body>
