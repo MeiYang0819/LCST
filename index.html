@@ -345,14 +345,14 @@
       <!-- 第2頁：基本資料① -->
       <section class="step" data-page="2" id="step-2">
         <div class="row">
-          <label for="team">© 公司名稱 <small>⏍ 請確認後再行點選</small></label>
-          <select id="team">
+          <label for="company">© 公司名稱 <small>⏍ 請確認後再行點選</small></label>
+          <select id="company">
             <option value="" selected disabled>請選擇</option>
             <option>Drunk Caffee 爛醉咖啡</option>
             <option>FIZZ.FIZZ.TEIPEI</option>
             <option>Social Company 有趣人類社交局</option>
           </select>
-          <div class="error" id="errTeam">⚠️ 尚未選擇公司</div>
+          <div class="error" id="errcompany">⚠️ 尚未選擇公司</div>
         </div>
 
         <div class="row">
@@ -898,9 +898,9 @@ function validatePage(n, submit=false){
     }
     case 2: {
       let ok = true;
-      const corpInvalid = $("#corp").value.trim()==="";
-      $("#errCorp").style.display = (corpInvalid && shouldShowErr("corp", submit)) ? "block" : "none";
-      if(corpInvalid) ok=false;
+      const companyInvalid = $("#company").value.trim()==="";
+      $("#errcompany").style.display = (companyInvalid && shouldShowErr("company", submit)) ? "block" : "none";
+      if(companyInvalid) ok=false;
 
       const teamInvalid = !$("#team").value;
       $("#errTeam").style.display = (teamInvalid && shouldShowErr("team", submit)) ? "block" : "none";
@@ -1107,7 +1107,7 @@ function bindLiveValidation(){
   $$('input[name="agree1"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agree1'); updateNavState(); }));
 
   /* 第2頁 */
-  ["#corp","#team","#workType","#startDate","#wage"].forEach(sel=>{
+  ["#company","#team","#workType","#startDate","#wage"].forEach(sel=>{
     const el=$(sel); if(!el) return;
     ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
