@@ -1,12 +1,10 @@
-我先詢問問題 等等用這個調整
-
 <!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
   <!-- 鎖縮放：避免打字後需要自行縮小；搭配 iOS 聚焦字級=16 一起使用 -->
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
-  <title>📝 勞報建檔表</title>
+  <title>📝 勞工名卡建檔表</title>
 
   <style>
   :root {
@@ -46,15 +44,15 @@
     --footer-h: 44px;           /* 頁尾字級（可調） */
     --kv-offset: 0px;           /* 鍵盤彈出時向上位移量（JS 寫入） */
 
-    /* 新增：上一頁/下一頁縮小用（可調） */
+    /* 上一頁/下一頁縮小用（可調） */
     --nav-btn-min-h: 32px;      /* 只影響「上一頁 / 下一頁」兩顆按鈕的最小高度（可調） */
     --nav-btn-pad: 4px 10px;    /* 只影響「上一頁 / 下一頁」兩顆按鈕的內距（可調） */
 
-    /* 新增：操作列內距（可調，縮小整列高度） */
+    /* 操作列內距（可調，縮小整列高度） */
     --actionbar-pad-y: 6px;     /* 操作列上下內距（可調） */
     --actionbar-pad-x: 12px;    /* 操作列左右內距（可調） */
 
-    /* 新增：面板背景變數（由 data-* 控制） */
+    /* 面板背景變數（由 data-* 控制） */
     --panel-bg: linear-gradient(0deg,rgba(43,37,37,1) 0%, rgba(0,0,0,1) 100%); /* 預設黑 */
     /*//* --------第10頁：範例圖片尺寸/外觀（可自行調整；新增）--------*/*/
     --sample-gap: 10px;         /* 圖片之間的間距（可調） */
@@ -101,7 +99,7 @@
     background: var(--panel-bg) !important; /* 以變數為最終背景 */
   }
 
-  /* ===== 新增：用 data-scheme 控制黑/紫兩種底色（取代原本紅色） ===== */
+  /* ===== 用 data-scheme 控制黑/紫兩種底色（取代原本紅色） ===== */
   .container[data-scheme="black"]{
     --panel-bg: linear-gradient(0deg,rgba(43,37,37,1) 0%, rgba(0,0,0,1) 100%);
   }
@@ -272,6 +270,15 @@
   .step[data-page="12"]{ --title-size: 15px; --content-size: 12px; }
   .step[data-page="13"]{ --title-size: 15px; --content-size: 12px; }
 
+  /* 指定頁 h2 置右（1=注意事項、3=個人資訊、7=其他資訊、10=上傳檔案、12=資料送出前-核檢區） */
+.step[data-page="1"] h2,
+.step[data-page="3"] h2,
+.step[data-page="7"] h2,
+.step[data-page="10"] h2,
+.step[data-page="12"] h2 {
+  text-align: right !important;
+}
+
   /* 第10頁：範例圖片改上下 */
   .samples{ display:grid; grid-template-columns:1fr; gap:var(--sample-gap); align-items:start; margin-top:10px; }
   .sample-box{ background:var(--sample-bg); border:1px dashed var(--control-border); border-radius:var(--sample-radius); padding:var(--sample-pad); display:flex; flex-direction:column; align-items:center; }
@@ -297,20 +304,20 @@
       <h3>輸入密碼後即可填寫</h3>
       <p>請向人資承辦索取密碼🔐</p>
       <div class="row">
-        <label for="gatePwd">輸入密碼</label>
-        <input id="gatePwd" type="password" placeholder="請輸入密碼🔑" />
+        <label for="gatePwd">輸入金鑰🔑</label>
+        <input id="gatePwd" type="password" placeholder="請輸入密碼" />
         <div class="error" id="gatePwdErr">❌ 密碼錯誤，請再試一次</div>
       </div>
       <div class="gate-actions">
-        <button class="btn" id="gatePwdStart" type="button">開始填寫</button>
+        <button class="btn" id="gatePwdStart" type="button">確定</button>
       </div>
     </div>
   </div>
 
-  <div class="container" role="region" aria-label="勞報建檔表 分步表單" data-scheme="black">
+  <div class="container" role="region" aria-label="勞工名卡建檔表 分步表單" data-scheme="black">
     <header class="header">
-      <!-- 標題：依你要求「勞報建檔表」、粗體＋陰影 -->
-      <div class="header-title">📝 勞報建檔表</div>
+      <!-- 標題：依你要求「勞工名卡建檔表」、粗體＋陰影 -->
+      <div class="header-title">📝 勞工名卡建檔表</div>
       <div class="header-step" id="headerStep">第01頁/共13頁</div>
     </header>
 
@@ -421,6 +428,12 @@
           <label for="nid">© 身分證字號 <small>⏍ 共計10碼</small></label>
           <input id="nid" type="text" placeholder="範例 ☛A123456789" />
           <div class="error" id="errNid">⚠️ 格式或填寫錯誤</div>
+        </div>
+
+        <div class="row">
+          <label for="indigenous">© 原住民身分<small>⏍ 有原住民身分直接填寫哪一族，若無則填寫否</small></label>
+          <input id="indigenous" type="text" placeholder="範例 ☛否或布農族" />
+          <div class="error" id="errIndigenous">⚠️ 此欄位不得為空</div>
         </div>
       </section>
 
@@ -543,7 +556,7 @@
           </div>
 
           <div class="row">
-            <label for="depName">© 姓名</label>⏍ 若有兩人以上,同上</small></label>
+            <label for="depName">© 姓名</label><small>⏍ 若有兩人以上,同上</small></label>
             <input id="depName" type="text" placeholder="範例 ☛孫悟空,孫悟飯" />
             <div class="error" id="errDepName">⚠️ 此欄不得為空</div>
           </div>
@@ -562,12 +575,13 @@
         </div>
       </section>
 
-      <!-- 第10頁：⏫ 上傳檔案 -->
+      <!-- 第10頁：上傳檔案 -->
       <section class="step" data-page="10" id="step-10">
         <h2>⏫ 上傳檔案</h2>
         <ol class="note-list">
           <li>上傳之個人身分文件.</li>
           <li>有正確及及錯誤範例.</li>
+          <li>若有必要須印出並浮貼,故資料要正式.</li>
           <li>檔案須符合本公司限定規格.</li>
           <li>哀鳳手機請用手機內建備忘錄掃描.</li>
         </ol>
@@ -576,11 +590,19 @@
         <div class="samples" aria-label="身分證範本">
           <figure class="sample-box">
             <img class="sample-img" src="assets/身分證範本-正面.jpg" alt="❗️範例-身分證上傳限定規格-正面">
-            <figcaption class="sample-cap">❗️範例-身分證上傳限定規格-正面</figcaption>
+            <figcaption class="sample-cap">✅ 正確範例-身分證上傳限定規格-正面</figcaption>
           </figure>
           <figure class="sample-box">
             <img class="sample-img" src="assets/身分證範本-背面.png" alt="❗️範例-身分證上傳限定規格-背面">
-            <figcaption class="sample-cap">範例-身分證上傳限定規格-背面</figcaption>
+            <figcaption class="sample-cap">✅ 正確範例-身分證上傳限定規格-背面</figcaption>
+          </figure>
+          <figure class="sample-box">
+            <img class="sample-img" src="assets/錯誤範例-1.jpg" alt="❗️錯誤範例-1.jpg">
+            <figcaption class="sample-cap">❌ 錯誤範例-四角未對四個角且要歪頭看</figcaption>
+          </figure>
+          <figure class="sample-box">
+            <img class="sample-img" src="assets/錯誤範例-2.jpg" alt="❗️錯誤範例-2.jpg">
+            <figcaption class="sample-cap">❌ 錯誤範例-四角未對四個角且有小手入鏡</figcaption>
           </figure>
         </div>
 
@@ -633,7 +655,7 @@
         </div>
       </section>
 
-      <!-- 第12頁：❗️資料送出前-核檢區（7 條勾選；不顯示錯誤） -->
+      <!-- 第12頁：❗️資料送出前-核檢區 -->
       <section class="step" data-page="12" id="step-12">
         <h2>❗️資料送出前-核檢區</h2>
         <div class="fieldset">
@@ -914,6 +936,10 @@ function validatePage(n, submit=false){
       $("#errNid").style.display = (nidInvalid && shouldShowErr("nid", submit)) ? "block" : "none";
       if(nidInvalid) ok=false;
 
+      const indigInvalid = $("#indigenous").value.trim()==="";
+      $("#errIndigenous").style.display = (indigInvalid && shouldShowErr("indigenous", submit)) ? "block" : "none";
+      if(indigInvalid) ok=false;
+
       return ok;
     }
     case 5: {
@@ -985,34 +1011,30 @@ function validatePage(n, submit=false){
     }
     case 9: {
       let ok = true;
-      const val = $("#depEnable").value;
-      const enInvalid = !val;
-      $("#errDepEnable").style.display = (enInvalid && shouldShowErr("depEnable", submit)) ? "block" : "none";
-      const show = (val==="是");
-      $("#depFields").style.display = show ? "block" : "none";
-      if(enInvalid) ok=false;
+  const val = $("#depEnable").value;
+  const enInvalid = !val;
+  $("#errDepEnable").style.display = (enInvalid && shouldShowErr("depEnable", submit)) ? "block" : "none";
+  const show = (val==="是");
+  $("#depFields").style.display = show ? "block" : "none";
+  if(enInvalid) ok=false;
 
-      if(show){
-        const rInvalid = $("#depRel").value.trim()==="";
-        $("#errDepRel").style.display = (rInvalid && shouldShowErr("depRel", submit)) ? "block" : "none";
-        if(rInvalid) ok=false;
+  if(show){
+    const rInvalid = $("#depRel").value.trim()==="";
+    $("#errDepRel").style.display = (rInvalid && shouldShowErr("depRel", submit)) ? "block" : "none";
+    if(rInvalid) ok=false;
 
-        const nInvalid = $("#depName").value.trim()==="";
-        $("#errDepName").style.display = (nInvalid && shouldShowErr("depName", submit)) ? "block" : "none";
-        if(nInvalid) ok=false;
+    const nInvalid = $("#depName").value.trim()==="";
+    $("#errDepName").style.display = (nInvalid && shouldShowErr("depName", submit)) ? "block" : "none";
+    if(nInvalid) ok=false;
 
-        const idInvalid = !isTenAlnum($("#depNid").value.trim());
-        $("#errDepNid").style.display = (idInvalid && shouldShowErr("depNid", submit)) ? "block" : "none";
-        if(idInvalid) ok=false;
-
-        const bInvalid = !isValidRoc7($("#depBirth7").value.trim());
-        $("#errDepBirth7").style.display = (bInvalid && shouldShowErr("depBirth7", submit)) ? "block" : "none";
-        if(bInvalid) ok=false;
-      } else {
-        ["errDepRel","errDepName","errDepNid","errDepBirth7"].forEach(id=> $("#"+id).style.display="none");
-      }
-      return ok;
-    }
+    /* 取消驗證：眷屬身分證字號、民國出生年月日 */
+    $("#errDepNid").style.display = "none";
+    $("#errDepBirth7").style.display = "none";
+  } else {
+    ["errDepRel","errDepName","errDepNid","errDepBirth7"].forEach(id=> $("#"+id).style.display="none");
+  }
+  return ok;
+}
     case 10: {
       const yes = $('input[name="agreeUpload"][value="yes"]').checked;
       $("#errAgreeUpload").style.display = (!yes && shouldShowErr("agreeUpload", submit)) ? "block":"none";
@@ -1092,12 +1114,11 @@ function bindLiveValidation(){
   $$('input[name="agreeInfo"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agreeInfo'); updateNavState(); }));
 
   /* 第4頁 */
-  ["#fullName","#gender","#nid"].forEach(sel=>{
-    const el=$(sel); if(!el) return;
-    ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
-    ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
+  ["#fullName","#gender","#nid","#indigenous"].forEach(sel=>{
+  const el=$(sel); if(!el) return;
+  ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
+  ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
-  $("#nid")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errNid").style.display=(v!=="" && !alnumPrefixOK(v,10))?"block":"none"; });
 
   /* 第5頁 */
   ["#birthRoc7","#birthPlace","#addrHouse","#addrLive"].forEach(sel=>{
@@ -1138,8 +1159,6 @@ function bindLiveValidation(){
     ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
   });
   $("#depEnable")?.addEventListener('change', ()=>{ updateNavState(); });
-  $("#depNid")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errDepNid").style.display=(v!=="" && !alnumPrefixOK(v,10))?"block":"none"; });
-  $("#depBirth7")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errDepBirth7").style.display=(v!=="" && !digitsPrefixOK(v,7))?"block":"none"; });
 
   /* 第10頁 同意 */
   $$('input[name="agreeUpload"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agreeUpload'); updateNavState(); }));
@@ -1211,3 +1230,4 @@ document.addEventListener("DOMContentLoaded", ()=>{
 </script>
 </body>
 </html>
+這樣正確嗎?
