@@ -669,6 +669,12 @@
             <label><input type="checkbox" id="preG"> 提交表單後,請完成截圖回報機制.</label>
           </div>
         </div>
+
+      <!-- 修改按鈕為提交 -->
+          <div class="actionbar">
+          <button class="btn" id="btnSubmit" type="button">提交</button>
+          </div>
+
       </section>
 
       <!-- 第13頁：全數完成 -->
@@ -706,32 +712,11 @@
 <script>
 
 /* --------系統常數（可調）-------- */
-const ACCESS_PWDS = ["MYsSC1114", "MYsDC1114", "MYsFZ1114"]; // 設定三組密碼
+const TOTAL_STEPS = 13;  /* 總頁數（顯示用；更新為 13） */
+const ACCESS_PWDS =  ["MYs-SC","MYs-DC","MYs-FZ"]; /* 進入密碼（可調） */
 
-const passGate = document.getElementById("passGate");
-const pwdInput = document.getElementById("gatePwd");
-const btnStart = document.getElementById("gatePwdStart");
-const errorMsg = document.getElementById("gatePwdErr");
-
-if (!passGate) return;
-
-errorMsg.style.display = "none"; // 初始化錯誤訊息隱藏
-
-btnStart.addEventListener("click", () => {
-  const inputPwd = (pwdInput.value || "").trim().toUpperCase();  // 轉為大寫，檢查大小寫不敏感
-
-  // 檢查密碼是否正確
-  if (!ACCESS_PWDS.includes(inputPwd)) {
-    errorMsg.style.display = "block"; // 密碼錯誤，顯示錯誤訊息
-    return;
-  }
-
-  // 密碼正確，隱藏密碼框，開始進入表單
-  errorMsg.style.display = "none";
-  passGate.style.display = "none"; // 隱藏密碼框
-  setCreatedNow();  // 記錄表單創建時間
-  autoFitActionbarHeight();  // 調整操作列
-});
+const $  = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
 
 /* 表單時間戳（建立/更新） */
 const FORM_META = { createdAt: null, updatedAt: null };
@@ -1223,93 +1208,22 @@ function autoFitActionbarHeight(){
   ro.observe(bar);
 })();
 
-/* ====== 事件綁定與初始化 ====== */
-function bindActionBar(){
-  $("#btnPrev").addEventListener("click", ()=>{ 
-    if(!IS_LOCKED && currentPage>1){ 
-      showStep(currentPage-1); 
-    } 
-  });
-
-  $("#btnNext").addEventListener("click", ()=>{ 
-    if(IS_LOCKED) return; 
-    const ok = validatePage(currentPage, /*submit*/ true); 
-    if(ok && currentPage<TOTAL_STEPS){ 
-      setUpdatedNow(); 
-      showStep(currentPage+1); 
-    }
-  });
-
-  /* 修改這裡：將第12頁的「下一頁」變為「提交」 */
-  const submitBtn = $("#btnSubmit");
-  if(submitBtn){
-    submitBtn.addEventListener("click", () => {
-      if(IS_LOCKED) return;
-      setUpdatedNow();
-      
-      // 這裡可以添加提交表單的操作（例如：將表單資料發送到後端或 Google Apps Script）
-      // 假設這是一個表單提交的函數，根據需求調整
-      submitForm();
-      
-      // 顯示提交後的訊息或鎖定表單
-      alert("表單已成功提交！");
-      lockAllAndHideNav(); // 鎖定表單，禁止進一步操作
-    });
-  }
-}
-
-/* 提交表單的函數（假設的函數，根據需求更改） */
-function submitForm() {
-  // 這裡你可以進行實際的表單提交操作，例如調用後端接口或 Google Apps Script
-  console.log("提交表單資料...");
-  // 在此處加上 Google Sheets 的提交邏輯或其他後端處理邏輯
-  // 例如：向 Google Apps Script 發送 POST 請求
-}
-
-/* ====== 前端表單資料提交 ====== */
-
-// 提交表單的函數
-function submitForm() {
-  // 收集表單資料
-  const formData = {
-    email: document.getElementById('email').value,  // 假設 email 欄位的 id 是 email
-    agree1: document.querySelector('input[name="agree1"]:checked').value,  // 假設 agree1 是同意欄位
-    company: document.getElementById('corp').value,  // 假設公司名稱欄位 id 是 corp
-    team: document.getElementById('team').value,  // 假設團隊欄位 id 是 team
-    workType: document.getElementById('workType').value,  // 假設工作型態欄位 id 是 workType
-    startDate: document.getElementById('startDate').value,  // 假設到職日期欄位 id 是 startDate
-    wage: document.getElementById('wage').value,  // 假設工資欄位 id 是 wage
-    fullName: document.getElementById('fullName').value,  // 假設本名欄位 id 是 fullName
-    gender: document.getElementById('gender').value,  // 假設性別欄位 id 是 gender
-    nid: document.getElementById('nid').value,  // 假設身分證號欄位 id 是 nid
-    // 其他表單欄位資料...
-  };
-
-  // 使用 fetch 發送 POST 請求
-  fetch('https://script.google.com/macros/s/AKfycbxvy1JnnTYhLuRdzIw_-6t60sTMVd0wKZoMcQxgW0uGlllbCwX8uRtQJk7WOjdW03kY/exec', {  // 用您 Google Apps Script 部署的 Web App URL 替換這裡
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams(formData),  // 將表單資料轉換為 URL 編碼格式
-  })
-  .then(response => response.text())  // 處理後端回應
-  .then(data => {
-    console.log('Form submitted successfully:', data);
-    // 顯示成功訊息或進行其他操作，例如跳轉或清除表單
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-}
-  
 /* ====== 導航/完成 ====== */
 function bindActionBar(){
   $("#btnPrev").addEventListener("click", ()=>{ if(!IS_LOCKED && currentPage>1){ showStep(currentPage-1); } });
-  $("#btnNext").addEventListener("click", ()=>{ if(IS_LOCKED) return; const ok = validatePage(currentPage, /*submit*/ true); if(ok && currentPage<TOTAL_STEPS){ setUpdatedNow(); showStep(currentPage+1); } });
+  $("#btnNext").addEventListener("click", ()=>{
+    if(IS_LOCKED) return;
+    const ok = validatePage(currentPage, /*submit*/ true);
+    if(ok && currentPage<TOTAL_STEPS){ setUpdatedNow(); showStep(currentPage+1); }
+  });
+  /* 安全判斷：若沒有完成按鈕，就不綁事件 */
   const fin = $("#btnFinish");
   if(fin){
-    fin.addEventListener("click", ()=>{ if(IS_LOCKED) return; setUpdatedNow(); showStep(TOTAL_STEPS); });
+    fin.addEventListener("click", ()=>{
+      if(IS_LOCKED) return;
+      setUpdatedNow();
+      showStep(TOTAL_STEPS);
+    });
   }
 }
 
