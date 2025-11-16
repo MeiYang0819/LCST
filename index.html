@@ -678,7 +678,7 @@
             <label><input type="checkbox" id="preE"> 5. 本表單有提供檢核表,請確實檢查後再勾選.</label>
             <label><input type="checkbox" id="preF"> 5-1. 若勾選後還填寫錯誤,請自負責任.</label>
             <label><input type="checkbox" id="preG"> 6. 提交表單後無法更改資訊,請確認填寫資料正確再提交.</label>
-            <label><input type="checkbox" id="preG"> 7. 提交表單後,請完成截圖回報機制.</label>
+            <label><input type="checkbox" id="preH"> 7. 提交表單後,請完成截圖回報機制.</label>
           </div>
         </div>
         <div class="right-actions" style="display:flex; gap:10px;">
@@ -702,17 +702,19 @@
       </section>
     </main>
 
-    <div class="actionbar">
-      <div class="left-actions">
-        <button class="btn" id="btnPrev" type="button">上一頁</button>
-      </div>
-      <div class="right-actions">
-        <button class="btn" id="btnNext" type="button">下一頁</button>
-        <button class="btn" id="btnSubmit" type="button">提交</button>
-      </div>
-    </div>
-  </div>
+    function updateNavState() {
+  const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnSubmit = $("#btnSubmit");
+  const onLast = currentPage === TOTAL_STEPS;
 
+  // 上一頁按鈕：只在第12頁前顯示
+  btnPrev.style.display = onLast ? "none" : "inline-block";
+
+  // 提交按鈕：只在第12頁顯示
+  btnSubmit.style.display = onLast ? "inline-block" : "none";
+
+  // 下一頁按鈕：在第12頁隱藏
+  btnNext.style.display = onLast ? "none" : "inline-block";
+}
     <!-- 底部固定操作列（全頁共用） -->
     <div class="actionbar" id="actionbar">
       <div class="left-actions">
@@ -804,58 +806,91 @@ function checkFormFilled() {
   }
 }
 
-  // 表單提交功能（在第12頁提交）
-  document.getElementById("btnSubmit").addEventListener("click", () => {
+// 表單提交功能（在第12頁提交）
+document.getElementById("btnSubmit").addEventListener("click", () => {
   // 在這裡您可以調用提交表單數據的Google Apps Script
   // 例如：saveFormDataToSheet()
+  
+  // 檢查是否已填寫過表單
   checkFormFilled();
-  alert("表單已成功提交！");
-  });
 
-  // 從表單中獲取資料並發送至後端
-    document.getElementById('workerForm').addEventListener('submit', function(e) {
-      e.preventDefault();  // 阻止表單自動提
+  // 收集表單資料
+  const formData = {
+    email: document.getElementById('email').value,
+    company: document.getElementById('company').value,
+    team: document.getElementById('team').value,
+    workType: document.getElementById('workType').value,
+    startDate: document.getElementById('startDate').value,
+    wage: document.getElementById('wage').value,
+    fullName: document.getElementById('fullName').value,
+    gender: document.getElementById('gender').value,
+    nid: document.getElementById('nid').value,
+    indigenous: document.getElementById('indigenous').value,
+    birthRoc7: document.getElementById('birthRoc7').value,
+    birthPlace: document.getElementById('birthPlace').value,
+    addrHouse: document.getElementById('addrHouse').value,
+    addrLive: document.getElementById('addrLive').value,
+    gmail: document.getElementById('gmail').value,
+    edu: document.getElementById('edu').value,
+    emgName: document.getElementById('emgName').value,
+    emgRel: document.getElementById('emgRel').value,
+    homePhone: document.getElementById('homePhone').value,
+    emgMobile: document.getElementById('emgMobile').value,
+    emgAddr: document.getElementById('emgAddr').value,
+    depEnable: document.getElementById('depEnable').value,
+    depRel: document.getElementById('depRel').value,
+    depName: document.getElementById('depName').value,
+    depNid: document.getElementById('depNid').value,
+    depBirth7: document.getElementById('depBirth7').value,
+    idFront: document.getElementById('idFront').files[0],  // 檔案
+    idBack: document.getElementById('idBack').files[0],    // 檔案
+  };
 
-  // 用部署後的 Web App URL 替換以下部分
-      const apiUrl = 'https://script.google.com/macros/s/AKfycbx-O0BABG0Y_XldLwHHFJPB8-AoZRau84oQHRqUZ6sFSUQokfN4aMcEG7lnl5ox1E56/exec';  // 這是替換的地方
-
-      // 發送資料至 Google Apps Script Web App
-      fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          alert("表單已成功提交！");
-        } else {
-          alert(data.message);  // 顯示錯誤訊息
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-      });
-    });
-
-/* ====== 鍵盤與縮放控制（iOS） ====== */
-(function keyboardLift(){
-  const vv = window.visualViewport;
-  if(!vv) return;
-  function apply(){
-    const bottomInset = (window.innerHeight - vv.height - vv.offsetTop);
-    document.documentElement.style.setProperty('--kv-offset', bottomInset>0 ? `${bottomInset}px` : '0px');
-    if(bottomInset > 80){ document.body.classList.add('kb-open'); }
-    else { document.body.classList.remove('kb-open'); }
-    autoFitActionbarHeight();
+  // 確認是否填寫所有必填欄位
+  const allFilled = Object.values(formData).every(value => value !== "" && value !== undefined);
+  if (!allFilled) {
+    alert("請確認所有欄位已填寫！");
+    return;
   }
-  vv.addEventListener('resize', apply);
-  vv.addEventListener('scroll', apply);
-  window.addEventListener('resize', apply);
-  apply();
-})();
+
+  // 確認所有checkbox已勾選（例如第12頁的核檢區）
+  const preCheckBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+  if (preCheckBoxes.length !== 7) { // 確保7個核檢項目都勾選
+    alert("請勾選所有核檢項目！");
+    return;
+  }
+
+  // 提交表單資料
+  submitFormData(formData);
+});
+
+// 提交表單資料到後端
+function submitFormData(formData) {
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbzSWeGpjds_DP0mHs1qcZTeYg2Jar45DJr5pM8Qw2AO-j9ZHjq5ocYYBjsCji-BL3L_/exec';  // 這是替換的地方
+
+  const formDataToSend = new FormData();
+  for (const key in formData) {
+    formDataToSend.append(key, formData[key]);
+  }
+
+  fetch(apiUrl, {
+    method: 'POST',
+    body: formDataToSend,
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      alert("表單已成功提交！");
+      window.location.reload();  // 可選：提交成功後刷新頁面
+    } else {
+      alert(data.message || "提交失敗，請重試！");
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("提交失敗，請稍後再試！");
+  });
+}
 
 /* 焦點自動可視（避免被鍵盤或操作列擋住） */
 (function focusAutoScroll(){
