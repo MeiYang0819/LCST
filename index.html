@@ -702,19 +702,6 @@
       </section>
     </main>
 
-    function updateNavState() {
-  const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnSubmit = $("#btnSubmit");
-  const onLast = currentPage === TOTAL_STEPS;
-
-  // 上一頁按鈕：只在第12頁前顯示
-  btnPrev.style.display = onLast ? "none" : "inline-block";
-
-  // 提交按鈕：只在第12頁顯示
-  btnSubmit.style.display = onLast ? "inline-block" : "none";
-
-  // 下一頁按鈕：在第12頁隱藏
-  btnNext.style.display = onLast ? "none" : "inline-block";
-}
     <!-- 底部固定操作列（全頁共用） -->
     <div class="actionbar" id="actionbar">
       <div class="left-actions">
@@ -1010,6 +997,20 @@ function showStep(pageNumber){
   }
 }
 
+function updateNavState() {
+  const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnSubmit = $("#btnSubmit");
+  const onLast = currentPage === TOTAL_STEPS;
+
+  // 上一頁按鈕：只在第12頁前顯示
+  btnPrev.style.display = onLast ? "none" : "inline-block";
+
+  // 提交按鈕：只在第12頁顯示
+  btnSubmit.style.display = onLast ? "inline-block" : "none";
+
+  // 下一頁按鈕：在第12頁隱藏
+  btnNext.style.display = onLast ? "none" : "inline-block";
+}
+  
 /* ====== 各頁驗證（submit=false：不顯示紅字；true：顯示紅字） ====== */
 function isValidGmailOnSubmit(val, submit){
   val = (val||"").toLowerCase().trim();
