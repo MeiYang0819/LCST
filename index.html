@@ -443,7 +443,7 @@
 
         <div class="row">
           <label for="indigenous">© 原住民身分<small>⏍ 若有原住民身分直接填寫哪一族,若無則填寫「無」</small></label>
-          <input id="indigenous" type="text" placeholder="範例 ☛否或布農族" />
+          <input id="indigenous" type="text" placeholder="範例 ☛否或XX族" />
           <div class="error" id="errIndigenous">⚠️ 此欄位不得為空</div>
         </div>
       </section>
@@ -484,7 +484,7 @@
         </div>
 
         <div class="row">
-          <label for="mobile">© 聯絡手機 <small>⏍ 請以09xx-xxx-xxx格式填寫</small></label>
+          <label for="mobile">© 手機電話 <small>⏍ 請以09xx-xxx-xxx格式填寫</small></label>
           <input id="mobile" type="text" placeholder="範例 ☛0912-345-647" />
           <div class="error" id="errMobile">⚠️ 格式錯誤</div>
         </div>
@@ -529,7 +529,7 @@
         </div>
 
         <div class="row">
-          <label for="homePhone">© 室內電話 <small>⏍ 若無室內電話,則填寫「無」</small></label>
+          <label for="homePhone">© 家用電話 <small>⏍ 若無室內電話,則填寫「無」</small></label>
           <input id="homePhone" type="text" placeholder="請輸入家用電話" />
           <div class="error" id="errHomePhone">⚠️ 此欄不得為空</div>
         </div>
@@ -561,25 +561,25 @@
 
         <div id="depFields" style="display:none;">
           <div class="row">
-            <label for="depRel">© 關係<small>⏍ 若有兩人以上,以逗號分隔之</small></label>
+            <label for="depRel">© 眷屬關係<small>⏍ 若有兩人以上,以逗號分隔之</small></label>
             <input id="depRel" type="text" placeholder="範例 ☛父子,姊妹" />
             <div class="error" id="errDepRel">⚠️ 此欄不得為空</div>
           </div>
 
           <div class="row">
-            <label for="depName">© 姓名</label><small>⏍ 若有兩人以上,同上</small></label>
+            <label for="depName">© 眷屬姓名</label><small>⏍ 若有兩人以上,同上</small></label>
             <input id="depName" type="text" placeholder="範例 ☛孫悟空,孫悟飯" />
             <div class="error" id="errDepName">⚠️ 此欄不得為空</div>
           </div>
 
           <div class="row">
-            <label for="depNid">© 身分證字號 <small>⏍ 共計10碼,若有兩人以上,同上</small></label>
+            <label for="depNid">© 眷屬身分證字號 <small>⏍ 共計10碼,若有兩人以上,同上</small></label>
             <input id="depNid" type="text" placeholder="範例 ☛A123456789,B223456789" />
             <div class="error" id="errDepNid">⚠️ 填寫或格式錯誤</div>
           </div>
 
           <div class="row">
-            <label for="depBirth7">© 民國出生年月日 <small>⏍ 請以yyyMMdd格式填寫,共7碼,若有兩人以上,同上</small></label>
+            <label for="depBirth7">© 眷屬民國出生年月日 <small>⏍ 請以yyyMMdd格式填寫,共7碼,若有兩人以上,同上</small></label>
             <input id="depBirth7" type="text" placeholder="範例 ☛1121008,0750819" />
             <div class="error" id="errDepBirth7">⚠️ 格式須為7碼yyyMMdd</div>
           </div>
@@ -677,8 +677,12 @@
             <label><input type="checkbox" id="preD"> 4. 上傳檔案都符合本公司格式.</label>
             <label><input type="checkbox" id="preE"> 5. 本表單有提供檢核表,請確實檢查後再勾選.</label>
             <label><input type="checkbox" id="preF"> 5-1. 若勾選後還填寫錯誤,請自負責任.</label>
-            <label><input type="checkbox" id="preG"> 6. 提交表單後,請完成截圖回報機制.</label>
+            <label><input type="checkbox" id="preG"> 6. 提交表單後無法更改資訊,請確認填寫資料正確再提交.</label>
+            <label><input type="checkbox" id="preG"> 7. 提交表單後,請完成截圖回報機制.</label>
           </div>
+        </div>
+        <div class="right-actions" style="display:flex; gap:10px;">
+          <button class="btn btn--nav" id="btnSubmit" type="button">提交</button>
         </div>
       </section>
 
@@ -697,6 +701,17 @@
         </div>
       </section>
     </main>
+
+    <div class="actionbar">
+      <div class="left-actions">
+        <button class="btn" id="btnPrev" type="button">上一頁</button>
+      </div>
+      <div class="right-actions">
+        <button class="btn" id="btnNext" type="button">下一頁</button>
+        <button class="btn" id="btnSubmit" type="button">提交</button>
+      </div>
+    </div>
+  </div>
 
     <!-- 底部固定操作列（全頁共用） -->
     <div class="actionbar" id="actionbar">
@@ -740,8 +755,12 @@ function updateStampUI(){
 /* ====== 密碼進入遮罩-動態多組密碼 ====== */
 /* 密碼進入遮罩 - 動態多組密碼 */
 const PASSWORDS = ["MYsDC20251115", "MYsFZ20251115", "MYsSC20251115"]; // 密碼組，可隨時修改或新增
-
-const ACCESS_PWD = PASSWORDS[0]; // 設定為當前使用的密碼（默認是第一組）
+const ACCESS_PWD = PASSWORDS; // 目前所有密碼組
+  
+// 檢查輸入密碼是否匹配任意一個密碼
+function isValidPassword(inputPassword) {
+      return PASSWORDS.some(pwd => pwd.toLowerCase() === inputPassword.toLowerCase());
+    }
 
 (function passGateInit(){
   const gate = $("#passGate"), pwd = $("#gatePwd"), btn = $("#gatePwdStart"), err = $("#gatePwdErr");
@@ -762,8 +781,8 @@ const ACCESS_PWD = PASSWORDS[0]; // 設定為當前使用的密碼（默認是�
   err.style.display = "none";
   
   btn.addEventListener("click", () => {
-    const v = (pwd.value || "").trim().toLowerCase(); // 將輸入密碼轉為小寫
-    const isValid = PASSWORDS.some(pwd => pwd.toLowerCase() === v); // 比較時將所有密碼轉為小寫
+    const v = (pwd.value || "").trim(); // 去除大小寫區分
+    const isValid = isValidPassword(v); // 使用已定義的 isValidPassword 函數進行驗證
     if (!isValid) {  // 如果輸入的密碼不在密碼組內
       err.style.display = "block";
       return;
@@ -774,6 +793,52 @@ const ACCESS_PWD = PASSWORDS[0]; // 設定為當前使用的密碼（默認是�
     autoFitActionbarHeight();
   });
 })();
+
+/* ====== 表單提交前提示訊息 ====== */
+function checkFormFilled() {
+  const gender = document.querySelector("#gender").value;
+  if (gender === "男") {
+    alert("✋你已填寫過囉");
+  } else if (gender === "女") {
+    alert("✋妳已填寫過囉");
+  }
+}
+
+  // 表單提交功能（在第12頁提交）
+  document.getElementById("btnSubmit").addEventListener("click", () => {
+  // 在這裡您可以調用提交表單數據的Google Apps Script
+  // 例如：saveFormDataToSheet()
+  checkFormFilled();
+  alert("表單已成功提交！");
+  });
+
+  // 從表單中獲取資料並發送至後端
+    document.getElementById('workerForm').addEventListener('submit', function(e) {
+      e.preventDefault();  // 阻止表單自動提
+
+  // 用部署後的 Web App URL 替換以下部分
+      const apiUrl = 'https://script.google.com/macros/s/AKfycbx-O0BABG0Y_XldLwHHFJPB8-AoZRau84oQHRqUZ6sFSUQokfN4aMcEG7lnl5ox1E56/exec';  // 這是替換的地方
+
+      // 發送資料至 Google Apps Script Web App
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert("表單已成功提交！");
+        } else {
+          alert(data.message);  // 顯示錯誤訊息
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+    });
 
 /* ====== 鍵盤與縮放控制（iOS） ====== */
 (function keyboardLift(){
