@@ -797,12 +797,12 @@ function isValidPassword(inputPassword) {
   });
 })();
 
-// 第12頁全部打勾後才可提交
+// 監聽第12頁的所有勾選框，只有七項全部勾選才可提交
 document.querySelectorAll('#step-12 .checks input[type="checkbox"]').forEach(checkbox => {
   checkbox.addEventListener('change', checkCheckboxes);
 });
 
-// 檢查是否已全部打勾
+// 檢查是否已全部打勾（7項）
 function checkCheckboxes() {
   const allChecked = document.querySelectorAll('#step-12 .checks input[type="checkbox"]:checked').length === 7;
   const submitBtn = document.getElementById('btnSubmit');
@@ -825,27 +825,9 @@ function checkFormFilled() {
   }
 }
 
-// 提交按鈕觸發
-document.getElementById("btnSubmit").addEventListener("click", function () {
-  // 確保所有欄位已填寫
-  const formData = gatherFormData();
-  if (!validateFormData(formData)) {
-    alert("請確認所有欄位已填寫！");
-    return;
-  }
-  
-  // 提交資料到後端
-  submitFormData(formData);
-  
-  // 提交後使下一頁按鈕可用
-  document.getElementById("btnNext").disabled = false;
-  
-  // 提交後禁用提交按鈕，防止重複提交
-  this.disabled = true;
-});
-
-// 收集表單資料
-function gatherFormData() {
+// 表單提交
+document.getElementById("btnSubmit").addEventListener("click", () => {
+  // 收集表單資料
   const formData = {
     email: document.getElementById('email').value,
     company: document.getElementById('company').value,
@@ -876,8 +858,20 @@ function gatherFormData() {
     idFront: document.getElementById('idFront').files[0],  // 檔案
     idBack: document.getElementById('idBack').files[0],    // 檔案
   };
-  return formData;
-}
+
+  // 確認表單資料是否完整
+  if (!validateFormData(formData)) {
+    alert("請確認所有欄位已填寫！");
+    return;
+  }
+
+  // 提交資料到後端
+  submitFormData(formData);
+
+  // 提交後使下一頁按鈕可用
+  document.getElementById("btnNext").disabled = false;
+  document.getElementById("btnSubmit").disabled = true;  // 提交後禁用提交按鈕
+});
 
 // 驗證表單資料是否完整
 function validateFormData(formData) {
