@@ -48,6 +48,20 @@
     select {
     font-size: 8px !important;  /* 調小所有選單的字體 */
     }
+
+    /* 調整提交按鈕置中並靠下 */
+    #btnSubmit {
+    position: absolute;
+    bottom: 20px; /* 讓提交按鈕靠近頁面底部 */
+    left: 50%;
+    transform: translateX(-50%); /* 置中 */
+    }
+
+    /* 提交按鈕 Disabled */
+    #btnSubmit:disabled {
+    background-color: #ccc; /* 禁用狀態的背景顏色 */
+    cursor: not-allowed;
+    }
     
     /* 上一頁/下一頁縮小用（可調） */
     --nav-btn-min-h: 32px;      /* 只影響「上一頁 / 下一頁」兩顆按鈕的最小高度（可調） */
@@ -792,9 +806,11 @@ document.querySelectorAll('#step-12 .checks input[type="checkbox"]').forEach(che
 function checkCheckboxes() {
   const allChecked = document.querySelectorAll('#step-12 .checks input[type="checkbox"]:checked').length === 7;
   const submitBtn = document.getElementById('btnSubmit');
+  const nextBtn = document.getElementById('btnNext');
   
   // 如果已勾選所有選項，啟用提交按鈕
   submitBtn.disabled = !allChecked;
+  nextBtn.disabled = !allChecked; // 下一頁也要禁用
 }
 
 // 表單提交前提示訊息
@@ -844,22 +860,10 @@ document.getElementById("btnSubmit").addEventListener("click", () => {
     idBack: document.getElementById('idBack').files[0],    // 檔案
   };
 
-  // 確認是否填寫所有必填欄位
-  const allFilled = Object.values(formData).every(value => value !== "" && value !== undefined);
-  if (!allFilled) {
-    alert("請確認所有欄位已填寫！");
-    return;
-  }
-
-  // 確認所有checkbox已勾選（例如第12頁的核檢區）
-  const preCheckBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-  if (preCheckBoxes.length !== 7) { // 確保7個核檢項目都勾選
-    alert("請勾選所有核檢項目！");
-    return;
-  }
-
   // 提交表單資料
   submitFormData(formData);
+  // 提交後，禁用下一頁按鈕，防止多次提交
+  document.getElementById('btnNext').disabled = false;
 });
 
 // 提交表單資料到後端
