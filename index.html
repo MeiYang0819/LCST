@@ -690,9 +690,9 @@
             <label><input type="checkbox" id="preC"> 3. 本人聲明無偽造之不法情形.</label>
             <label><input type="checkbox" id="preD"> 4. 上傳檔案都符合本公司格式.</label>
             <label><input type="checkbox" id="preE"> 5. 本表單有提供檢核表,請確實檢查後再勾選.</label>
-            <label><input type="checkbox" id="preF"> 5-1. 若勾選後還填寫錯誤,請自負責任.</label>
-            <label><input type="checkbox" id="preG"> 6. 提交表單後無法更改,請查核填寫資料正確無誤再提交.</label>
-            <label><input type="checkbox" id="preH"> 7. 提交表單後,在按下一頁後完成截圖回報機制.</label>
+            <label><input type="checkbox" id="preF"> 6. 若勾選後還填寫錯誤,請自負責任.</label>
+            <label><input type="checkbox" id="preG"> 7. 提交表單後無法更改,請查核填寫資料正確無誤再提交.</label>
+            <label><input type="checkbox" id="preH"> 8. 提交表單後,在按下一頁後完成截圖回報機制.</label>
           </div>
         </div>
         <div class="right-actions" style="display:flex; gap:10px; justify-content:center; position:relative; bottom:0;">
@@ -787,7 +787,7 @@ function isValidPassword(inputPassword) {
     const v = (pwd.value || "").trim(); // 去除大小寫區分
     const isValid = isValidPassword(v); // 使用已定義的 isValidPassword 函數進行驗證
     if (!isValid) {  // 如果輸入的密碼不在密碼組內
-      err.style.display = "block";
+      err.style.display = "block";      // 顯示錯誤訊息
       return;
     }
     err.style.display = "none";
@@ -811,7 +811,7 @@ function checkCheckboxes() {
   // 只有勾選所有8項才能啟用提交按鈕
   submitBtn.disabled = !allChecked;
 
-  // 當全部勾選並且提交後，才能點下一頁
+  // 下一頁按鈕：需要提交後才可啟用
   nextBtn.disabled = !allChecked || submitBtn.disabled;
 }
 
@@ -1305,52 +1305,82 @@ function bindLiveValidation(){
   /* 第7頁 */
   $$('input[name="agreeOther"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agreeOther'); updateNavState(); }));
 
-  /* 第8頁 */
-  ["#emgName","#emgRel","#homePhone","#emgMobile","#emgAddr"].forEach(sel=>{
-    const el=$(sel); if(!el) return;
-    ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
-    ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
-  });
-  $("#emgMobile")?.addEventListener('input', (e)=>{ const v=e.target.value; $("#errEmgMobile").style.display=(v!=="" && !mobilePrefixOK(v))?"block":"none"; });
+  case 8: {
+      let ok = true;
+      const nInvalid = $("#emgName").value.trim()==="";
+      $("#errEmgName").style.display = (nInvalid && shouldShowErr("emgName", submit)) ? "block" : "none";
+      if(nInvalid) ok=false;
 
-  /* 第9頁 */
-  ["#depEnable","#depRel","#depName","#depNid","#depBirth7"].forEach(sel=>{
-    const el=$(sel); if(!el) return;
-    ["input","change","blur"].forEach(evt=> el.addEventListener(evt, ()=>{ markTouched(el.id); }));
-    ["input","change"].forEach(evt=> el.addEventListener(evt, updateNavState));
-  });
-  $("#depEnable")?.addEventListener('change', ()=>{ updateNavState(); });
+      const rInvalid = $("#emgRel").value.trim()==="";
+      $("#errEmgRel").style.display = (rInvalid && shouldShowErr("emgRel", submit)) ? "block" : "none";
+      if(rInvalid) ok=false;
 
-  /* 第10頁 同意 */
-  $$('input[name="agreeUpload"]').forEach(r=> r.addEventListener('change', ()=>{ markTouched('agreeUpload'); updateNavState(); }));
+      const hInvalid = $("#homePhone").value.trim()==="";
+      $("#errHomePhone").style.display = (hInvalid && shouldShowErr("homePhone", submit)) ? "block" : "none";
+      if(hInvalid) ok=false;
 
-  /* 第11頁 檔名 + 縮圖 */
-  function bindPreview(inputSel, nameTxtSel, thumbSel){
-    const input=$(inputSel), nameTxt=$(nameTxtSel), thumb=$(thumbSel);
-    if(!input) return;
-    let lastURL=null;
-    input.addEventListener('change', ()=>{
-      markTouched(input.id);
-      const f=input.files?.[0];
-      nameTxt.textContent = f ? f.name : "尚未選取檔案";
-      if(lastURL){ URL.revokeObjectURL(lastURL); lastURL=null; }
-      if(f && f.type.startsWith('image/')){ lastURL=URL.createObjectURL(f); thumb.src=lastURL; thumb.style.display='inline-block'; }
-      else{ thumb.style.display='none'; thumb.src=""; }
-      updateNavState();
-    });
+      const mInvalid = !isValidMobile($("#emgMobile").value.trim());
+      $("#errEmgMobile").style.display = (mInvalid && shouldShowErr("emgMobile", submit)) ? "block" : "none";
+      if(mInvalid) ok=false;
+
+      const addr = $("#emgAddr").value.trim();
+      const aInvalid = (addr==="") || /同戶籍地|同戶籍/.test(addr);
+      $("#errEmgAddr").style.display = (aInvalid && shouldShowErr("emgAddr", submit)) ? "block" : "none";
+      if(aInvalid) ok=false;
+
+      return ok;
+    }
+    case 9: {
+      let ok = true;
+      const val = $("#depEnable").value;
+      const enInvalid = !val;
+      $("#errDepEnable").style.display = (enInvalid && shouldShowErr("depEnable", submit)) ? "block" : "none";
+      const show = (val === "是");
+      $("#depFields").style.display = show ? "block" : "none";
+      if(enInvalid) ok=false;
+
+      if(show){
+        const rInvalid = $("#depRel").value.trim()==="";
+        $("#errDepRel").style.display = (rInvalid && shouldShowErr("depRel", submit)) ? "block" : "none";
+        if(rInvalid) ok=false;
+
+        const nInvalid = $("#depName").value.trim()==="";
+        $("#errDepName").style.display = (nInvalid && shouldShowErr("depName", submit)) ? "block" : "none";
+        if(nInvalid) ok=false;
+
+        /* 取消驗證：眷屬身分證字號、民國出生年月日 */
+        $("#errDepNid").style.display = "none";
+        $("#errDepBirth7").style.display = "none";
+      } else {
+        ["errDepRel", "errDepName", "errDepNid", "errDepBirth7"].forEach(id => $("#" + id).style.display = "none");
+      }
+      return ok;
+    }
+    case 10: {
+      const yes = $('input[name="agreeUpload"][value="yes"]').checked;
+      $("#errAgreeUpload").style.display = (!yes && shouldShowErr("agreeUpload", submit)) ? "block" : "none";
+      return yes;
+    }
+    case 11: {
+      let ok = true;
+      const f = $("#idFront").files?.length > 0, b = $("#idBack").files?.length > 0;
+      $("#errFront").style.display = (!f && shouldShowErr("idFront", submit)) ? "block" : "none"; 
+      if (!f) ok = false;
+      $("#errBack").style.display = (!b && shouldShowErr("idBack", submit)) ? "block" : "none"; 
+      if (!b) ok = false;
+      const all = ["#chk1", "#chk2", "#chk3", "#chk4"].every(sel => $(sel).checked);
+      if (!all) ok = false;
+      return ok;
+    }
+    case 12: {
+      /* 你的規則：全部勾選才通過，不顯示錯誤訊息 */
+      const all = ["#preA", "#preB", "#preC", "#preD", "#preE", "#preF", "#preG", "#preH"].every(sel => $(sel).checked);
+      return all;
+    }
+    case 13: return true; // 最後一頁，直接返回 true
   }
-  bindPreview("#idFront","#nameFrontTxt","#thumbFront");
-  bindPreview("#idBack","#nameBackTxt","#thumbBack");
-  ["#chk1","#chk2","#chk3","#chk4"].forEach(sel=> $(sel)?.addEventListener('change', updateNavState));
-
-  /* 第12頁（你的 8 個勾選） */
-["#preA","#preB","#preC","#preD","#preE","#preF","#preG","#preH"].forEach(sel=>{
-  $(sel)?.addEventListener('change', () => { 
-    markTouched('preflight');
-    checkCheckboxes();  // 檢查是否所有勾選框都被勾選
-    updateNavState();   // 更新按鈕狀態
-  });
-});
+  return false; // 預設為 false
+}
 
 function checkCheckboxes() {
   const allChecked = document.querySelectorAll('#step-12 .checks input[type="checkbox"]:checked').length === 8;
@@ -1381,17 +1411,44 @@ function bindActionBar(){
     const ok = validatePage(currentPage, /*submit*/ true);
     if(ok && currentPage<TOTAL_STEPS){ setUpdatedNow(); showStep(currentPage+1); }
   });
-  /* 安全判斷：若沒有完成按鈕，就不綁事件 */
-  const fin = $("#btnFinish");
-  if(fin){
-    fin.addEventListener("click", ()=>{
-      if(IS_LOCKED) return;
-      setUpdatedNow();
-      showStep(TOTAL_STEPS);
-    });
+  
+  /* ====== 底部操作列：狀態控制 ====== */
+function updateNavState() {
+  const btnPrev = $("#btnPrev"), btnNext = $("#btnNext"), btnFinish = $("#btnFinish");
+  const onLast = currentPage === TOTAL_STEPS;
+
+  btnPrev.disabled = IS_LOCKED || currentPage <= 1;
+  btnNext.style.display = onLast ? "none" : "inline-block";
+  btnNext.disabled = IS_LOCKED || !validatePage(currentPage, /*submit*/ false);
+
+  /* 安全判斷：若沒有完成按鈕，以下不執行 */
+  if (btnFinish) {
+    btnFinish.style.display = onLast ? "none" : "inline-block"; /* 最後一頁不要完成 */
+    btnFinish.disabled = IS_LOCKED || onLast || currentPage !== TOTAL_STEPS; /* 最後一頁直接隱藏，不使用 */
   }
+
+  if (onLast) { btnPrev.style.display = "none"; } else { btnPrev.style.display = "inline-block"; }
 }
 
+  /* 清除當頁（函式保留但按鈕已移除） */
+function clearCurrentPage() {
+  const cur = $(`.step.active`);
+  if (!cur) return;
+  cur.querySelectorAll('input[type="text"],input[type="email"]').forEach(i => i.value = "");
+  cur.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+  cur.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(c => c.checked = false);
+  if (cur.id === "step-11") {
+    $("#idFront").value = ""; $("#idBack").value = "";
+    $("#nameFrontTxt").textContent = "尚未選取檔案";
+    $("#nameBackTxt").textContent = "尚未選取檔案";
+    $("#thumbFront").style.display = "none"; $("#thumbBack").style.display = "none";
+    $("#thumbFront").src = ""; $("#thumbBack").src = "";
+  }
+  cur.querySelectorAll('.error').forEach(e => e.style.display = "none");
+  if (cur.id === "step-1") { $("#exitMsg").classList.remove("show"); }
+  updateNavState();
+}
+  
 /* 初始顯示第1頁 */
 document.addEventListener("DOMContentLoaded", ()=>{
   showStep(1);
